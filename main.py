@@ -173,7 +173,8 @@ def create_spotify_oauth(scope):
 def pocetak_spotify_auth_vracanje_linka():
     """
     Kada se radi autentifikacija, dobija se auth_url koja mora da se unese u python kod,
-    ovde tor adim preko spotify_callback() funkcije
+    ovde tor adim preko spotify_callback() funkcije. Ukoliko nije korisnik ulogovan na spotify,
+    traži da se uloguje
     :return:
     """
     scope = 'playlist-read-private'
@@ -187,8 +188,15 @@ def spotify_callback():
     scope = 'playlist-read-private playlist-modify-private'
     sp_oauth = create_spotify_oauth(scope)
     session.pop('token_info', None)
-    code = request.args.get('code')
-    token_info = sp_oauth.get_access_token(code)
+
+    # Deo koda koji nije potreban, prijaviljivao mi je da je dobijanje recnika sa get_access_token, prevaziđeno
+        #dobijam gresku u python flask : 127.0.0.1 - - [07/Apr/2023 10:46:00] "GET /pocetak_spotify_auth_vracanje_linka HTTP/1.1" 302 -
+    # C:\Users\Miroslav\PycharmProjects\web_aplikacija_spotify\main.py:191: DeprecationWarning: You're using 'as_dict = True'.get_access_token will return the token string directly in future versions. Please adjust your code accordingly, or use get_cached_token instead.
+    #   token_info = sp_oauth.get_access_token(code)
+    # code = request.args.get('code')
+    # token_info = sp_oauth.get_access_token(code)
+
+    token_info = sp_oauth.get_cached_token()
     session["token_info"] = token_info
     return redirect(url_for('spotify_podaci_posle_auth'))
 
