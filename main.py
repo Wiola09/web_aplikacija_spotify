@@ -188,14 +188,6 @@ def spotify_callback():
     scope = 'playlist-read-private playlist-modify-private'
     sp_oauth = create_spotify_oauth(scope)
     session.pop('token_info', None)
-
-    # Deo koda koji nije potreban, prijaviljivao mi je da je dobijanje recnika sa get_access_token, prevaziđeno
-        #dobijam gresku u python flask : 127.0.0.1 - - [07/Apr/2023 10:46:00] "GET /pocetak_spotify_auth_vracanje_linka HTTP/1.1" 302 -
-    # C:\Users\Miroslav\PycharmProjects\web_aplikacija_spotify\main.py:191: DeprecationWarning: You're using 'as_dict = True'.get_access_token will return the token string directly in future versions. Please adjust your code accordingly, or use get_cached_token instead.
-    #   token_info = sp_oauth.get_access_token(code)
-    # code = request.args.get('code')
-    # token_info = sp_oauth.get_access_token(code)
-
     token_info = sp_oauth.get_cached_token()
     session["token_info"] = token_info
     return redirect(url_for('spotify_podaci_posle_auth'))
@@ -209,16 +201,7 @@ def spotify_podaci_posle_auth():
         return redirect('/pocetak_spotify_auth_vracanje_linka')
 
     sp = spotipy.Spotify(auth_manager=SpotifyOAuth(scope='playlist-read-private'))
-
-    # sp = spotipy.Spotify(auth_manager=SpotifyOAuth(
-    #     scope='playlist-read-private',
-    #     client_id=app.config['SPOTIPY_CLIENT_ID'],
-    #     client_secret=app.config['SPOTIPY_CLIENT_SECRET'],
-    #     redirect_uri=app.config['SPOTIPY_REDIRECT_URI'],
-    #
-    # ))
     playlists = sp.current_user_playlists()
-    # print(playlists)
     return jsonify(playlists)
 
 
