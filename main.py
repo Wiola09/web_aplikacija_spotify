@@ -8,6 +8,7 @@ from spotipy.oauth2 import SpotifyOAuth
 
 # # Deo koji se odnosi na moje fajlove
 from data_manager import db, DataManager, UserData, UserSema
+from spotify_baratanje import SpotifyMoja
 
 APP_SECRET_KEY = os.getenv("APP_SECRET_KEY", "default_value")
 
@@ -52,6 +53,7 @@ each user at a website (like account info, past purchases, carts, etc.)"""
 with app.app_context():
     db.create_all()
 
+
 @login_manager.user_loader
 def load_user(user_id):
     return db.session.get(UserSema, int(user_id))
@@ -67,6 +69,7 @@ def favicon():
     :return: file favicon.ico
     """
     return redirect(url_for('static', filename='images/favicon.ico'))
+
 
 @app.route('/')
 def pocetak():
@@ -128,10 +131,10 @@ def register():
                 user = UserSema.query.filter_by(email=email).first()
 
         except:
-                db.session.rollback()
-                user = None
-                print(user, "hvata ovaj")
-                # rukujte s pogreškom na odgovarajući način
+            db.session.rollback()
+            user = None
+            print(user, "hvata ovaj")
+            # rukujte s pogreškom na odgovarajući način
         finally:
             db.session.close()
 
@@ -156,18 +159,12 @@ def logout():
     print(current_user, "posle logout")
     return redirect(url_for('pocetak', logged_in=current_user.is_authenticated))
 
+
 @app.route('/pocetna_aplikacija', methods=["GET", "POST"])
 @login_required
 def pocetna_aplikacija():
     return "Zdravo Svete"
 
-def create_spotify_oauth(scope):
-    return SpotifyOAuth(
-        client_id=app.config['SPOTIPY_CLIENT_ID'],
-        client_secret=app.config['SPOTIPY_CLIENT_SECRET'],
-        redirect_uri=app.config['SPOTIPY_REDIRECT_URI'],
-        scope=scope
-    )
 
 @app.route('/pocetak_spotify_auth_vracanje_linka')
 def pocetak_spotify_auth_vracanje_linka():
@@ -178,15 +175,16 @@ def pocetak_spotify_auth_vracanje_linka():
     :return:
     """
     scope = 'playlist-read-private'
-    sp_oauth = create_spotify_oauth(scope)
+    sp_oauth = SpotifyMoja.create_spotify_oauth(scope, app)
     auth_url = sp_oauth.get_authorize_url()
     print(auth_url)
     return redirect(auth_url)
 
+
 @app.route('/spotify_callback')
 def spotify_callback():
     scope = 'playlist-read-private playlist-modify-private'
-    sp_oauth = create_spotify_oauth(scope)
+    sp_oauth = SpotifyMoja.create_spotify_oauth(scope, app)
     session.pop('token_info', None)
     token_info = sp_oauth.get_cached_token()
     session["token_info"] = token_info
@@ -201,8 +199,22 @@ def spotify_podaci_posle_auth():
         return redirect('/pocetak_spotify_auth_vracanje_linka')
 
     sp = spotipy.Spotify(auth_manager=SpotifyOAuth(scope='playlist-read-private'))
-    playlists = sp.current_user_playlists()
-    return jsonify(playlists)
+
+    # kod za dobijanje playlista od korisnika
+    liste_recnik = SpotifyMoja.sve_playliste(sp)
+    # print(liste_recnik)
+    # for i in liste_recnik:
+    #     print(i)
+    odabrana_lista = '2003-08-12 Billboard 100'
+    rezultat = SpotifyMoja.prikaz_pesama_u_playlist_ceo_json(sp, liste_recnik[odabrana_lista])
+
+    # return jsonify(rezultat['items'][0])  # Kod vraca JSON podatke i samo ejdnoj pesmi
+    return render_template("prikaz_pesama_playlista.html", pesme=rezultat['items'], lista=odabrana_lista)
+
+
+@app.route('/prikaz_pesama_playlista', methods=["GET", "POST"])
+def prikaz_pesama_playlista():
+    return render_template("prikaz_pesama_playlista")
 
 
 if __name__ == '__main__':

@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+
+{% block content %}
+<hr>
+<hr>
+
+<h2 class="heading">Pesme iz play liste {{lista}} su: </h2>
+
+{% for item in pesme %}
+    <a href="{{item['track']['external_urls']['spotify']}}" class="heading"> Song {{loop.index}}. {{item['track']['name']}}</a>
+    <div class="content">
+        <a href="{{item['track']['artists'][0]['external_urls']['spotify']}}" class="heading"> Artist {{item['track']['artists'][0]['name']}}</a>
+
+        <a href="{{item['track']['album']['external_urls']['spotify']}}" class="heading">Album name: {{item['track']['album']['name']}}</a>
+
+        <hr class="heading">
+        <img src="{{item['track']['album']['images'][1]['url']}}">
+        <hr class="heading">
+<!--        <a href="{{item['track']['href']}}" class="button"> Link autentif</a>-->
+        <a href="{{item['track']['external_urls']['spotify']}}" class="button"> Pusti pesmu</a>
+        <a href="{{item['track']['preview_url']}}" class="button"> Pesma deo</a>
+        <hr class="heading">
+    </div>
+{% endfor %}
+{% endblock %}
+
+{% include "footer.html" %}
+
+
