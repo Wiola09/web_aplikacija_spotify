@@ -1,0 +1,309 @@
+ *, *:before, *:after {
+	 box-sizing: border-box;
+}
+.flash {
+text-align: center;
+color: red;
+}
+.box {
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	margin: -150px 0 0 -150px;
+	width:300px;
+	height:300px;
+}
+.box h1 { color: #fff; text-shadow: 0 0 10px rgba(0,0,0,0.3); letter-spacing:1px; text-align:center; }
+ body {
+	 background-color: #ecf0f9;
+	 padding-bottom:100px;
+}
+.prikazLeta {
+padding: 4em
+
+}
+
+ .heading {
+	 width: 100%;
+	 margin-left: 1rem;
+	 font-weight: 900;
+	 font-size: 1.618rem;
+	 text-transform: uppercase;
+	 letter-spacing: 0.1ch;
+	 line-height: 1;
+	 padding-bottom: 0.5em;
+	 padding-top: 40px;
+	 margin-bottom: 1rem;
+	 position: relative;
+}
+ .heading:after {
+	 display: block;
+	 content: '';
+	 position: absolute;
+	 width: 60px;
+	 height: 4px;
+	 background: linear-gradient(135deg, #1a9be6, #1a57e6);
+	 bottom: 0;
+}
+
+
+
+ .description {
+	 width: 100%;
+	 margin-top: 0;
+	 margin-left: 1rem;
+	 margin-bottom: 3rem;}
+
+	 /*  deo koji se odnosi na karticu front i back deo*/
+
+ .card {
+	 color: inherit;
+	 cursor: pointer;
+	 width: calc(33% - 3rem);
+	 min-width: calc(33% - 3rem);
+	 height: 500px;
+	 min-height: 300px;
+	 perspective: 1000px;
+	 margin: 1rem auto;
+	 position: relative;
+}
+@media (max-width: 768px) {
+   .card {
+      width: calc(90% - 2rem);
+      min-width: calc(90% - 2rem);
+   }
+}
+
+@media (max-width: 576px) {
+   .card {
+      width: 80%;
+      min-width: 80%;
+   }
+}
+
+ .front, .back {
+	 display: flex;
+	 border-radius: 6px;
+	 background-position: center;
+	 background-size: cover;
+	 text-align: center;
+	 justify-content: center;
+	 align-items: center;
+	 position: absolute;
+	 height: 100%;
+	 width: 100%;
+	 -webkit-backface-visibility: hidden;
+	 backface-visibility: hidden;
+	 transform-style: preserve-3d;
+	 transition: ease-in-out 600ms;
+}
+
+ .front {
+	 background-size: cover;
+	 padding: 2rem;
+	 font-size: 1.618rem;
+	 font-weight: 600;
+	 color: #fff;
+	 overflow: hidden;
+	 font-family: Poppins, sans-serif;
+}
+ .front:before {
+	 position: absolute;
+	 display: block;
+	 content: '';
+	 top: 0;
+	 left: 0;
+	 right: 0;
+	 bottom: 0;
+	 background: linear-gradient(135deg, #1a9be6, #1a57e6);
+	 opacity: 0.25;
+	 z-index: -1;
+}
+
+/* Ovaj deo omogucava iluziju okretanja kartice gde se gubi prednji deo i ostaje samo zadnji */
+ .card:hover .front {
+	 transform: rotateY(180deg);
+}
+/* Ne znam čemu ovo služi
+ .card:nth-child(even):hover .front {
+	 transform: rotateY(-180deg);
+} */
+
+/* ekstra fora ovaj deo sakriva tekst koji se nalazi sa zadnje starne kartice */
+
+ .back {
+	 background: #fff;
+	 transform: rotateY(-180deg);
+	 padding: 0 2em;
+}
+
+/* Bez ovog dela uopste se nevidi zadnjid deo kartice ???!!!  */
+
+ .card:hover .back {
+	 transform: rotateY(0deg);
+}
+/*  uopsšte ne znam čemu ovo služi*/
+/*
+ .card:nth-child(even) .back {
+	 transform: rotateY(180deg);
+}
+ .card:nth-child(even):hover .back {
+	 transform: rotateY(0deg);
+}
+*/
+
+
+/* Stilizuje font kod krtak review filma */
+.review {
+    font-style: italic;
+    margin-bottom: 20px;
+}
+/* Stilizuje font kod duži overview, opisa filma */
+ p.overview {
+	 font-size: 12px;
+	 height: 200px;
+	 width: 100%;
+	 overflow: hidden;
+	 text-overflow: ellipsis;
+}
+/* Stilizuje font za ocenu filma ubacuje lepu zlatnu boju*/
+.rating {
+    color: #E4BB23;
+}
+/* Stilizuje font za poziciju filma koja je napred */
+.large {
+     font-size: 10rem;
+  }
+/* klasa zaduzena za formatiranje flask forme, na stranici add*/
+/* tek sa dodavanjem klase .content i argumenta width: 100%;, uspeo sam da rastegnem polja na
+ maksimalnu sirinu na stranici register*/
+ .content {
+	 display: flex;
+	 margin: 0 auto;
+	 justify-content: center;
+	 align-items: center;
+	 flex-wrap: wrap;
+	 max-width: 1000px;
+	 width: 100%;
+	 text-align: center;
+}
+.container{
+	 display: flex;
+	 margin: 0 auto;
+	 justify-content: center;
+	 align-items: center;
+	 flex-wrap: wrap;
+	 max-width: 1500px;
+	 width: 50%;
+
+	 }
+.kontejner_footer {
+width: 100%;
+display: block;
+}
+
+
+.dugme_forma {
+    margin-top: 20px;
+    display: flex;
+    justify-content: center;
+    pa
+}
+/*
+.content form {
+    max-width: none;
+    width: 30%;
+}
+
+@media (max-width: 576px) {
+.content form {
+max-width: none;
+width: 90%;
+}
+}
+
+@media (max-width: 768px) {
+.content form {
+max-width: none;
+width: 75%;
+}
+}
+
+@media (max-width: 992px) {
+.content form {
+max-width: none;
+width: 60%;
+}
+}
+
+@media (max-width: 1200px) {
+.content form {
+max-width: none;
+width: 50%;
+}
+}*/
+
+
+/* Deo vezan za dugme add na kraju index.html*/
+.container.add {
+    margin-top: 40px;
+    margin-bottom: 20px;
+    tek
+}
+
+
+ .button {
+	 transform: translateZ(40px);
+	 cursor: pointer;
+	 -webkit-backface-visibility: hidden;
+	 backface-visibility: hidden;
+	 font-weight: bold;
+	 color: #fff;
+	 padding: 0.5em 1em;
+	 border-radius: 100px;
+	 font: inherit;
+	 background: linear-gradient(135deg, #1a9be6, #1a57e6);
+	 border: none;
+	 position: relative;
+	 transform-style: preserve-3d;
+	 transition: 300ms ease;
+}
+
+/* Delete dugme pre svega za crvenu boju*/
+.button.delete-button {
+	 background-color: rgba(230, 87, 230, 0.25);
+	 background: linear-gradient(135deg, #e61a46, #e61a1a);
+}
+
+footer {
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  height: 60px;
+  background-color: #f5f5f5;
+  padding: 0px 0 75px;
+}
+
+footer .list-inline {
+  margin: 0;
+  padding-top: 5px;
+}
+
+footer .copyright {
+  font-size: 14px;
+  margin-bottom: 0;
+  text-align: center;
+}
+
+/* Ovaj CSS kod cilja na pseudo-element ::before, koji se koristi da se kreira jedan dodatni element pre glavnog HTML
+elementa. Kada se koristi u ovom slučaju, ova pseudo-klasa se primenjuje na sve elemente koji imaju klasu "bi-envelope"
+ili elemente koji počinju sa "bi-envelope" (npr. "bi-envelope-1", "bi-envelope-red" itd.), ili elemente koji sadrže
+" bi-envelope" u svojoj klasi (npr. "icon bi-envelope", "envelope bi-envelope-large" itd.). Line-height svojstvo se
+koristi za postavljanje visine linije za tekst u unutar ovih pseudo-elementa. Ovde je postavljeno na "2", što znači da
+će linije teksta biti dva puta veće nego što je visina fonta koji se koristi. To se može koristiti da bi se vertikalni
+ razmak između ikone i teksta povećao, na primer da bi se ikona koverte malo podigla i bolje se uklopila
+ sa ostatkom elementa.*/
+
+.bi-envelope::before, [class^="bi-envelope"]::before, [class*=" bi-envelope"]::before {
+line-height: 2;
+}
