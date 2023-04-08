@@ -1,3 +1,4 @@
+
 from spotipy.oauth2 import SpotifyOAuth
 
 
@@ -79,9 +80,54 @@ class SpotifyMoja:
 
         return results
 
+    def pronadji_pesme_iz_liste(sp):
+        date = "2003-08-12"
+        song_names = ['Incomplete', 'Bent', "It's Gonna Be Me", "Jumpin', Jumpin'"]
+        song_uris = []
+        year = date.split("-")[0]
+        broj_preskocene = 0
+        for song in song_names:
+            result = sp.search(q=f"track:{song} year:{year}", type="track")
+            # print(result)
+            try:
+                uri = result["tracks"]["items"][0]["uri"]
+                song_uris.append(uri)
+            except IndexError:
+                broj_preskocene += 1
+                print(f"{broj_preskocene}. {song} doesn't exist in Spotify. Skipped.")
 
+        # with open("text2.txt", "a") as f:
+        #     for i in song_uris:
+        #         f.write(i + "\n")
+        return song_uris
 
-# <!--    <hr class="heading">-->
-# <!--    <div> <h4> IATA kod {{grad['code']}}, ime grada je {{grad['name']}}, ime grada i države je {{grad['slug_en']}}"</h4>-->
-# <!--        <a href="{{ url_for('unesi_grad_u_db', iata_kod_grada=grad['code'], ime_grada=grad['name']) }}" class="button">Dodaj u bazu</a></div>-->
-# <!--    <br>-->
+    def kreiraj_pl_i_dodaj_pesme(sp, song_uris):
+        """
+        Kreira play listu i doaje pesme
+        """
+        user_id = sp.current_user()["id"]
+        date = "2007-08-12"
+        playlist = sp.user_playlist_create(user=user_id, name=f"{date} Billboard 100", public=False)
+        print(playlist)
+
+        sp.playlist_add_items(playlist_id=playlist["id"], items=song_uris)
+
+        print("Care dodao !!!")
+
+    def obrisi_pesmu(sp, id_liste, id_pesme):
+        """
+        playlist_remove_all_occurrences_of_items(playlist_id, items, snapshot_id=None)
+        Removes all occurrences of the given tracks/episodes from the given playlist
+
+        Parameters:
+        playlist_id - the id of the playlist
+        items - list of track/episode ids to remove from the playlist
+        :param id_liste:
+        :param id_pesme:
+        :return:
+        """
+        try:
+            sp.playlist_remove_all_occurrences_of_items(playlist_id=id_liste, items=[id_pesme])
+            print("obrisana")
+        except:
+            print("greska")
