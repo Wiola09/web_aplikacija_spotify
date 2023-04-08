@@ -4,11 +4,14 @@ from flask_bootstrap import Bootstrap
 from werkzeug.security import check_password_hash
 from flask_login import LoginManager, login_user, current_user, login_required, logout_user
 import spotipy
+import logging
+from logging.handlers import RotatingFileHandler
 from spotipy.oauth2 import SpotifyOAuth
 
 # # Deo koji se odnosi na moje fajlove
 from data_manager import db, DataManager, UserData, UserSema
 from spotify_baratanje import SpotifyMoja
+from spotify_utils import SpotifyMoja2
 
 APP_SECRET_KEY = os.getenv("APP_SECRET_KEY", "default_value")
 
@@ -52,6 +55,42 @@ each user at a website (like account info, past purchases, carts, etc.)"""
 # bez app_context() javlja gresku, mozda je do verzija Flask-SQLAlchemy==3.0.2
 with app.app_context():
     db.create_all()
+
+# Konfigurisanje logging-a
+formatter = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
+log_handler = RotatingFileHandler(filename="app.log", maxBytes=1000000, backupCount=10)
+log_handler.setLevel(logging.DEBUG)
+app.logger.setLevel(logging.DEBUG)
+log_handler.setFormatter(formatter)
+app.logger.addHandler(log_handler)
+# spotify = SpotifyMoja2('playlist-read-private', app)
+
+
+def loger_debug():
+    # Ako sada želite vidjeti koje druge razine logiranja su uključene i koje
+    # su isključene, možete koristiti sljedeći kod:
+    print("Level of app.logger:", app.logger.getEffectiveLevel())
+    # Provjeri status loggera
+    if app.logger.disabled:
+        print("Logger isključen!")
+    else:
+        print("Logger uključen!")
+
+    # Provjeri razinu efektivne razine loggera
+    if app.logger.getEffectiveLevel() == logging.DEBUG:
+        print("Debug razine loggera uključena!")
+    else:
+        print("Debug razine loggera isključena!")
+    print(app.debug)
+    app.debug = True
+    print(app.debug)
+    # Provjeri razinu efektivne razine loggera
+    if app.logger.getEffectiveLevel() == logging.DEBUG:
+        print("Debug razine loggera uključena!")
+    else:
+        print("Debug razine loggera isključena!")
+    # Provjeri logger
+    app.logger.debug("Poruka za debug")
 
 
 @login_manager.user_loader
@@ -175,8 +214,8 @@ def pocetak_spotify_auth_vracanje_linka():
     :return:
     """
     scope = 'playlist-read-private'
-    sp_oauth = SpotifyMoja.create_spotify_oauth(scope, app)
-    auth_url = sp_oauth.get_authorize_url()
+    sp_oauth = SpotifyMoja2(scope=scope, app=app)
+    auth_url = sp_oauth.get_auth_url()
     print(auth_url)
     return redirect(auth_url)
 
@@ -185,12 +224,31 @@ def pocetak_spotify_auth_vracanje_linka():
 def spotify_callback():
     # ovde mi ne sme biti dva pojma u scope !!!, nije gteo da se dobije token
     scope = 'playlist-read-private'
-    sp_oauth = SpotifyMoja.create_spotify_oauth(scope, app)
+    sp_oauth = SpotifyMoja2(scope=scope, app=app)
     session.pop('token_info', None)
     token_info = sp_oauth.get_cached_token()
     print(token_info, "ovde bi morao biti")
     session["token_info"] = token_info
     return redirect(url_for('spotify_podaci_posle_auth'))
+
+
+@app.route('/spotify_podaci_posle_auth')
+def spotify_podaci_posle_auth():
+    token_info = session.get("token_info", None)
+    if not token_info:
+        print("Nema token_info")
+        return redirect('/pocetak_spotify_auth_vracanje_linka')
+    sp = SpotifyMoja2(scope='playlist-read-private', app=app)
+
+    # pozivam metod iz moje klase, Override spotipy.Spotify.current_user_playlists() method
+    liste_recnik = sp.current_user_playlists()
+    odabrana_lista = '2003-08-12 Billboard 100'
+
+    rezultat = sp.playlist_items(liste_recnik[odabrana_lista])
+
+    # return jsonify(rezultat['items'][0])  # Kod vraca JSON podatke i samo ejdnoj pesmi
+    return render_template("prikaz_pesama_playlista.html", pesme=rezultat['items'], lista=odabrana_lista)
+
 
 @app.route('/pronadji_pesme_i_napravi_listu')
 def pronadji_pesme_i_napravi_listu():
@@ -204,41 +262,41 @@ def pronadji_pesme_i_napravi_listu():
         print("Nema token_info")
         return redirect('/pocetak_spotify_auth_vracanje_linka')
 
-    sp = spotipy.Spotify(auth_manager=SpotifyOAuth(scope='playlist-modify-private'))
-    song_uris= SpotifyMoja.pronadji_pesme_iz_liste(sp)
-    SpotifyMoja.kreiraj_pl_i_dodaj_pesme(sp, song_uris)
+    sp = SpotifyMoja2(scope='playlist-read-private', app=app)
+    song_uris = sp.pronadji_pesme_iz_liste()
+    sp.create_playlist_and_add_songs(song_uris)
 
     return "pogledaj liste"
 
-@app.route('/spotify_podaci_posle_auth')
-def spotify_podaci_posle_auth():
-    token_info = session.get("token_info", None)
-    if not token_info:
-        print("Nema token_info")
-        return redirect('/pocetak_spotify_auth_vracanje_linka')
-
-    sp = spotipy.Spotify(auth_manager=SpotifyOAuth(scope='playlist-read-private'))
-
-    # kod za dobijanje playlista od korisnika
-    liste_recnik = SpotifyMoja.sve_playliste(sp)
-    # print(liste_recnik)
-    # for i in liste_recnik:
-    #     print(i)
-    odabrana_lista = '2003-08-12 Billboard 100'
-    rezultat = SpotifyMoja.prikaz_pesama_u_playlist_ceo_json(sp, liste_recnik[odabrana_lista])
-    # print(rezultat['items'][0]['track']['id']) # "6YZ5KxfrGopg7r3aqjKio7"  test za song id
-    print(token_info)
-
-    # return jsonify(rezultat['items'][0])  # Kod vraca JSON podatke i samo ejdnoj pesmi
-    return render_template("prikaz_pesama_playlista.html", pesme=rezultat['items'], lista=odabrana_lista)
 
 @app.route('/obrisi_pesmu')
 def obrisi_pesmu():
 
     playlist_id = request.args.get('playlist_id')
-    song_id= request.args.get('song_id')
-    sp = spotipy.Spotify(auth_manager=SpotifyOAuth(scope='playlist-read-private'))
-    SpotifyMoja.obrisi_pesmu(sp,playlist_id, song_id)
+    song_id = request.args.get('song_id')
+    sp = SpotifyMoja2(scope='playlist-read-private', app=app)
+
+    try:
+        sp.playlist_remove_all_occurrences_of_items(playlist_id=playlist_id, items=[song_id])
+        print("Pesma uspešno obrisana iz liste.")
+    except spotipy.SpotifyException as e:
+        print("Greška prilikom brisanja pesme iz liste: {}".format(e))
+
+    return redirect(url_for("spotify_podaci_posle_auth"))
+
+
+@app.route('/premesti_pesmu')
+def premesti_pesmu():
+    playlist_id = request.args.get('playlist_id')
+    range_start = request.args.get('range_start')
+
+    sp = SpotifyMoja2(scope='playlist-read-private', app=app)
+    sp.playlist_reorder_items(playlist_id, range_start=(int(range_start) - 1), insert_before=5, range_length=1,
+                              snapshot_id=None)
+    # sp.pormeni_poziciju_pesme(playlist_id=playlist_id, range_start=(int(range_start)))
+
+    # sp = spotipy.Spotify(auth_manager=SpotifyOAuth(scope='playlist-read-private'))
+    # SpotifyMoja.pormeni_poziciju_pesme(sp, playlist_id=playlist_id, range_start=(int(range_start)))
 
     return redirect(url_for("spotify_podaci_posle_auth"))
 

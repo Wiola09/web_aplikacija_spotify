@@ -131,3 +131,21 @@ class SpotifyMoja:
             print("obrisana")
         except:
             print("greska")
+# todo: doraditi metod, da korisnik unese zeljenu poziciju
+    def pormeni_poziciju_pesme(sp, playlist_id, range_start):
+        """
+            playlist_reorder_items(playlist_id, range_start, insert_before, range_length=1, snapshot_id=None)
+            Reorder tracks in a playlist
+
+            Parameters:
+            playlist_id - the id of the playlist
+            range_start - the position of the first track to be reordered
+            range_length - optional the number of tracks to be reordered
+            (default: 1)
+            insert_before - the position where the tracks should be
+            inserted
+            snapshot_id - optional playlist’s snapshot ID
+        """
+        sp.playlist_reorder_items(playlist_id, range_start=(int(range_start) - 1), insert_before=5, range_length=1,
+                                  snapshot_id=None)
+
