@@ -183,19 +183,38 @@ def pocetak_spotify_auth_vracanje_linka():
 
 @app.route('/spotify_callback')
 def spotify_callback():
-    scope = 'playlist-read-private playlist-modify-private'
+    # ovde mi ne sme biti dva pojma u scope !!!, nije gteo da se dobije token
+    scope = 'playlist-read-private'
     sp_oauth = SpotifyMoja.create_spotify_oauth(scope, app)
     session.pop('token_info', None)
     token_info = sp_oauth.get_cached_token()
+    print(token_info, "ovde bi morao biti")
     session["token_info"] = token_info
     return redirect(url_for('spotify_podaci_posle_auth'))
 
+@app.route('/pronadji_pesme_i_napravi_listu')
+def pronadji_pesme_i_napravi_listu():
+    """
+    Pronalazi pemse iz liste, i kreira sa njima novu PL,
+     TODO: Napraviti pravu listu pesama i dodati je kao argument u funkciju pronadji_pesme_iz_liste
+    :return:
+    """
+    token_info = session.get("token_info", None)
+    if not token_info:
+        print("Nema token_info")
+        return redirect('/pocetak_spotify_auth_vracanje_linka')
+
+    sp = spotipy.Spotify(auth_manager=SpotifyOAuth(scope='playlist-modify-private'))
+    song_uris= SpotifyMoja.pronadji_pesme_iz_liste(sp)
+    SpotifyMoja.kreiraj_pl_i_dodaj_pesme(sp, song_uris)
+
+    return "pogledaj liste"
 
 @app.route('/spotify_podaci_posle_auth')
 def spotify_podaci_posle_auth():
     token_info = session.get("token_info", None)
     if not token_info:
-        print("cekaj cekaj bato petlja")
+        print("Nema token_info")
         return redirect('/pocetak_spotify_auth_vracanje_linka')
 
     sp = spotipy.Spotify(auth_manager=SpotifyOAuth(scope='playlist-read-private'))
@@ -207,9 +226,21 @@ def spotify_podaci_posle_auth():
     #     print(i)
     odabrana_lista = '2003-08-12 Billboard 100'
     rezultat = SpotifyMoja.prikaz_pesama_u_playlist_ceo_json(sp, liste_recnik[odabrana_lista])
+    # print(rezultat['items'][0]['track']['id']) # "6YZ5KxfrGopg7r3aqjKio7"  test za song id
+    print(token_info)
 
     # return jsonify(rezultat['items'][0])  # Kod vraca JSON podatke i samo ejdnoj pesmi
     return render_template("prikaz_pesama_playlista.html", pesme=rezultat['items'], lista=odabrana_lista)
+
+@app.route('/obrisi_pesmu')
+def obrisi_pesmu():
+
+    playlist_id = request.args.get('playlist_id')
+    song_id= request.args.get('song_id')
+    sp = spotipy.Spotify(auth_manager=SpotifyOAuth(scope='playlist-read-private'))
+    SpotifyMoja.obrisi_pesmu(sp,playlist_id, song_id)
+
+    return redirect(url_for("spotify_podaci_posle_auth"))
 
 
 @app.route('/prikaz_pesama_playlista', methods=["GET", "POST"])

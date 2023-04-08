@@ -19,6 +19,7 @@
 <!--        <a href="{{item['track']['href']}}" class="button"> Link autentif</a>-->
         <a href="{{item['track']['external_urls']['spotify']}}" class="button"> Pusti pesmu</a>
         <a href="{{item['track']['preview_url']}}" class="button"> Pesma deo</a>
+        <a href="{{ url_for('obrisi_pesmu', playlist_id='33PHqSuB3iMvZbgb4yL6zw', song_id=item['track']['id']) }}" class="button delete-button"> Obrisi pesmu</a>
         <hr class="heading">
     </div>
 {% endfor %}
