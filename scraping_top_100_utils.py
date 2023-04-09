@@ -48,4 +48,4 @@ class Top100Movies:
 
         pesme_lista_100 = [pesme_lista[i] for i in range(pocetni_ideks_pesma, 404, 4)]
         print(len(pesme_lista_100))
-        return pesme_lista_100
+        return (pesme_lista_100, url)

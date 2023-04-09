@@ -307,3 +307,8 @@ koristi za postavljanje visine linije za tekst u unutar ovih pseudo-elementa. Ov
 .bi-envelope::before, [class^="bi-envelope"]::before, [class*=" bi-envelope"]::before {
 line-height: 2;
 }
+
+/*  Resava mi problem boje dugmeta na stranici update*/
+.dugme-edit .btn {
+    background: linear-gradient(135deg, #1a9be6, #1a57e6);
+  }

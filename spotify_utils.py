@@ -90,14 +90,14 @@ class SpotifyMoja2(spotipy.Spotify):
          'tracks': {'href': 'https://api.spotify.com/v1/playlists/3KySwk31KxVdCGVWI1Gp5m/tracks', 'items': [],
                     'limit': 100, 'next': None, 'offset': 0, 'previous': None, 'total': 0}, 'type': 'playlist',
          'uri': 'spotify:playlist:3KySwk31KxVdCGVWI1Gp5m'}
-
-
-        self.logger.info(f"Created new playlist: {playlist['name']}")
+        dodat_broj_pesama = len(song_uris)
+        nova_play_lista = playlist['name']
+        self.logger.info(f"Created new playlist: {nova_play_lista}")
 
         self.playlist_add_items(playlist_id=playlist["id"], items=song_uris)
-        self.logger.info(f"Added {len(song_uris)} songs to the playlist.")
-
+        self.logger.info(f"Added {dodat_broj_pesama} songs to the playlist.")
         print("Care dodao !!!")
+        return dodat_broj_pesama, nova_play_lista
 
     def pronadji_pesme_iz_liste(self, song_names):
         date = "2003-08-12"

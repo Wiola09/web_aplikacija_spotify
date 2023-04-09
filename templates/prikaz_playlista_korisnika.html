@@ -3,22 +3,40 @@
 {% block content %}
 <hr>
 <hr>
+<h5>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+{% if messages %}
+{% for category, message in messages %}
+<div class="alert {% if category == 'success' %}alert-success{% else %}alert-danger{% endif %} alert-dismissible fade show" role="alert">
+    <p class="mb-0">{{ message | safe }}</p>
+    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+    </button>
+</div>
+{% endfor %}
+{% endif %}
+{% endwith %}
 
+</h5>
 <h2 class="heading">Play liste su: </h2>
     <a href="{{url_for('pronadji_pesme_i_napravi_listu')}}" class="button"> Ddoaj listu</a>
     <a href="{{url_for('forma_pretraga')}}" class="button"> Forma</a>
 
 {% for item, value in liste.items() %}
 <div class="content">
-    <h1 class="heading" target="_blank" rel="nofollow">
-        Playlista {{item}}</h1>
-    <a href="{{url_for('prikazi_pesme_sa_playliste', playlist_name=item, playlist_id=value)}}" class="button"> Pogledaj Pesme</a>
+<p class="heading">
+        {{loop.index}}. Playlista {{item}}</p>
+<a href="{{url_for('prikazi_pesme_sa_playliste', playlist_name=item, playlist_id=value)}}" class="button"> Pogledaj Pesme</a>
+    </div>
+<div class="content">
+   <form method="POST" action="{{ url_for('obrisati_listu') }}">
+    <input type="hidden" name="lista_za_brisanje" value="{{ value }}">
+    <button type="submit" class="button delete-button"><a href="#">Obrisi listu</a></button>
+    </form>
+
     <hr class="heading">
     {% set cover_url = playlist_cover_image(value) %}
     <img src="{{ cover_url }}" alt="Playlist Cover">
-
-
-    <hr class="heading">
 </div>
 {% endfor %}
 {% endblock %}

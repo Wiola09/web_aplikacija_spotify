@@ -261,6 +261,15 @@ def playlist_cover_image(playlist_id):
     return url_to_playlist_cover_image
 
 
+@app.route('/obrisati_listu', methods=['POST'])
+def obrisati_listu():
+    lista_za_brisanje = request.form['lista_za_brisanje']
+    sp = SpotifyMoja2(scope='playlist-read-private', app=app)
+    sp.current_user_unfollow_playlist(lista_za_brisanje)
+    flash(f"Lista je uspešno obrisana", category='success')
+    return redirect(url_for('spotify_podaci_posle_auth'))
+
+
 @app.route('/spotify_podaci_posle_auth')
 def spotify_podaci_posle_auth():
     token_info = session.get("token_info", None)
@@ -271,6 +280,10 @@ def spotify_podaci_posle_auth():
 
     # pozivam metod iz moje klase, Override spotipy.Spotify.current_user_playlists() method
     liste_recnik = sp.current_user_playlists()
+    print(len(liste_recnik), "pre brisanaj")
+    sp.current_user_unfollow_playlist("3KySwk31KxVdCGVWI1Gp5m")
+    liste_recnik = sp.current_user_playlists()
+    print(len(liste_recnik), "posle brisanja")
 
     return render_template("prikaz_playlista_korisnika.html",
                            liste=liste_recnik,
@@ -303,12 +316,12 @@ def pronadji_pesme_i_napravi_listu():
 
     sp = SpotifyMoja2(scope='playlist-read-private', app=app)
     objekat_pretraga_pesama = Top100Movies()
-    lista_pesama = objekat_pretraga_pesama.lista_top_100_pesama(godina=godina)
+    lista_pesama, billboard_url = objekat_pretraga_pesama.lista_top_100_pesama(godina=godina)
     # print(lista_pesama)
     song_uris = sp.pronadji_pesme_iz_liste(lista_pesama)
-    sp.create_playlist_and_add_songs(song_uris, date=godina)
-
-    return redirect(url_for("spotify_podaci_posle_auth"))
+    dodat_broj_pesama, nova_play_lista = sp.create_playlist_and_add_songs(song_uris, date=godina)
+    flash(f"Kreirana je nova play lista '{nova_play_lista}' sa {dodat_broj_pesama} pesama za rang listu po 'BILLBOARD HOT 100 LIST', orginalnu top listu možete pogledati na <a href='{billboard_url}'>web stranici</a>", category='success')
+    return redirect(url_for("spotify_podaci_posle_auth", billboard_url=billboard_url))
 
 
 @app.route('/obrisi_pesmu')
