@@ -4,7 +4,8 @@
 <hr>
 <hr>
 
-<h2 class="heading">Pesme iz play liste {{lista}} su: </h2>
+<h2 class="heading"> {{pesme|length}} Songs in playlist '{{lista}}': </h2>
+<a href="{{url_for('pronadji_pesme_i_napravi_listu')}}" class="button"> Dodaj pesmu</a>
 
 {% for item in pesme %}
 <div class="container">
