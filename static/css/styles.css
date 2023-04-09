@@ -262,6 +262,7 @@ width: 50%;
 	 font-weight: bold;
 	 color: #fff;
 	 padding: 0.5em 1em;
+	 padding-bottom:10px;
 	 border-radius: 100px;
 	 font: inherit;
 	 background: linear-gradient(135deg, #1a9be6, #1a57e6);
@@ -322,6 +323,11 @@ line-height: 2;
       background-repeat: no-repeat;
       padding: 50px;
       padding-top: 100px;
-
-
+}
+.svePesme{
+    padding: 25px;
+      padding-top: 35px;
+}
+.pesmePodaci{
+padding: 10px;
 }

@@ -7,22 +7,26 @@
 <h2 class="heading">Pesme iz play liste {{lista}} su: </h2>
 
 {% for item in pesme %}
-    <a href="{{item['track']['external_urls']['spotify']}}" class="heading"> Song {{loop.index}}. {{item['track']['name']}}</a>
-    <div class="content">
-        <a href="{{item['track']['artists'][0]['external_urls']['spotify']}}" class="heading"> Artist {{item['track']['artists'][0]['name']}}</a>
+<div class="container">
+    <div class="pesmePodaci">
+    <h5><a href="{{item['track']['external_urls']['spotify']}}"> Song {{loop.index}}. {{item['track']['name']}}</a> </h5>
+    <hr>
+    <h5><a href="{{item['track']['artists'][0]['external_urls']['spotify']}}"> Artist {{item['track']['artists'][0]['name']}}</a></h5>
 
-        <a href="{{item['track']['album']['external_urls']['spotify']}}" class="heading">Album name: {{item['track']['album']['name']}}</a>
-
-        <hr class="heading">
-        <img src="{{item['track']['album']['images'][1]['url']}}">
-        <hr class="heading">
+    <h5><a href="{{item['track']['album']['external_urls']['spotify']}}">Album name: {{item['track']['album']['name']}}</a></h5>
+        </div>
+    <div class="playListe svePesme" style="background-image: url('{{item['track']['album']['images'][1]['url']}}')">
 <!--        <a href="{{item['track']['href']}}" class="button"> Link autentif</a>-->
-        <a href="{{item['track']['external_urls']['spotify']}}" class="button"> Pusti pesmu</a>
-        <a href="{{item['track']['preview_url']}}" class="button"> Pesma deo</a>
-        <a href="{{ url_for('obrisi_pesmu', playlist_id=playlist_id, playlist_name=lista, song_id=item['track']['id']) }}" class="button delete-button"> Obrisi pesmu</a>
-        <a href="{{ url_for('premesti_pesmu', range_start=loop.index, playlist_id=playlist_id, playlist_name=lista )}}" class="button delete-button"> Premesti pesmu</a>
+        <a href="{{item['track']['external_urls']['spotify']}}" class="button"> Pusti</a>
+<!--        <a href="{{item['track']['preview_url']}}" class="button"> Pesma deo</a>-->
+         <hr class="heading">
+        <a href="{{ url_for('obrisi_pesmu', playlist_id=playlist_id, playlist_name=lista, song_id=item['track']['id']) }}" class="button delete-button"> Obrisi </a>
 
-        <hr class="heading">
+        <a href="{{ url_for('premesti_pesmu', range_start=loop.index, playlist_id=playlist_id, playlist_name=lista )}}" class="button delete-button"> Premesti</a>
+
+
+    </div>
+    <hr class="heading">
     </div>
 {% endfor %}
 {% endblock %}
