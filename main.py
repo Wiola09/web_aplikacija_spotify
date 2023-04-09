@@ -298,7 +298,7 @@ def prikazi_pesme_sa_playliste():
     playlist_name = request.args.get('playlist_name')
     rezultat = sp.playlist_items(playlist_id)
     # return jsonify(rezultat['items'][0])  # Kod vraca JSON podatke i samo ejdnoj pesmi
-    return render_template("prikaz_pesama_playlista.html", pesme=rezultat['items'], lista=playlist_name, playlist_id= playlist_id)
+    return render_template("prikaz_pesama_playlista.html", pesme=rezultat['items'], lista=playlist_name, playlist_id=playlist_id)
 
 
 @app.route('/pronadji_pesme_i_napravi_listu')
@@ -328,6 +328,7 @@ def pronadji_pesme_i_napravi_listu():
 def obrisi_pesmu():
     playlist_id = request.args.get('playlist_id')
     song_id = request.args.get('song_id')
+    playlist_name = request.args.get('playlist_name')
     sp = SpotifyMoja2(scope='playlist-read-private', app=app)
 
     try:
@@ -336,7 +337,7 @@ def obrisi_pesmu():
     except spotipy.SpotifyException as e:
         print("Greška prilikom brisanja pesme iz liste: {}".format(e))
 
-    return redirect(url_for("prikazi_pesme_sa_playliste", playlist_id=playlist_id))
+    return redirect(url_for("prikazi_pesme_sa_playliste", playlist_id=playlist_id, playlist_name=playlist_name))
 
 
 @app.route('/premesti_pesmu')
