@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+
+{% block title %}Dodaj listu{% endblock %}
+
+{% block content %}
+<hr>
+<hr>
+<div class="content dugme-edit">
+    <h1 class="heading">Unesite podatke za pesmu</h1>
+    {{ wtf.quick_form(form, novalidate='True') }}
+    </div>
+{% endblock %}
+
+{% include "footer.html" %}

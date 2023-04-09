@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+
+{% block content %}
+<hr>
+<hr>
+
+<h2 class="heading"> {{pesme|length}} Songs in playlist : </h2>
+<a href="{{url_for('pronadji_pesmu')}}" class="button"> Dodaj pesmu</a>
+
+{% for item in pesme %}
+<div class="container">
+    <div class="pesmePodaci">
+    <h5><a href="{{item['external_urls']['spotify']}}" target="_blank" rel="nofollow"> Song {{loop.index}}. {{item['name']}}</a> </h5>
+    <hr>
+    <h5><a href="{{item['artists'][0]['external_urls']['spotify']}}" target="_blank" rel="nofollow"> Artist {{item['artists'][0]['name']}}</a></h5>
+
+    <h5><a href="{{item['album']['external_urls']['spotify']}}" target="_blank" rel="nofollow">Album name: {{item['album']['name']}}</a></h5>
+        </div>
+    <div class="playListe svePesme" style="background-image: url('{{item['album']['images'][1]['url']}}')">
+<!--        <a href="{{item['href']}}" class="button"> Link autentif</a>-->
+        <a href="{{item['external_urls']['spotify']}}" class="button" target="_blank" rel="nofollow"> Pusti</a>
+<!--        <a href="{{item['preview_url']}}" class="button"> Pesma deo</a>-->
+         <hr class="heading">
+        <a href="{{ url_for('dodaj_pesmu', playlist_id=playlist_id, playlist_name=lista, song_uri=item['uri']) }}" class="button"> Dodaj u listu</a>
+
+        <a href="{{ url_for('premesti_pesmu', range_start=loop.index, playlist_id=playlist_id, playlist_name=lista )}}" class="button delete-button"> Premesti</a>
+
+
+    </div>
+    <hr class="heading">
+    </div>
+{% endfor %}
+{% endblock %}
+
+{% include "footer.html" %}
+
+

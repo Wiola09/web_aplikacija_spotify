@@ -23,7 +23,7 @@
 
 <h2 class="heading">Imate ukupno {{liste|length}} playliste: </h2>
 <a href="{{url_for('pronadji_pesme_i_napravi_listu')}}" class="button"> Ddoaj listu</a>
-<a href="{{url_for('forma_pretraga')}}" class="button"> Forma</a>
+<a href="{{url_for('forma_pretraga')}}" class="button"> Pretraži Billboard 100 liste</a>
 
 {% for item, value in liste.items() %}
 {% set cover_url = playlist_cover_image(value) %}

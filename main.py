@@ -10,7 +10,7 @@ from spotipy.oauth2 import SpotifyOAuth
 
 # # Deo koji se odnosi na moje fajlove
 from data_manager import db, DataManager, UserData, UserSema
-from forms_view import UnesiPodateZaPretraguForm
+from forms_view import UnesiPodateZaPretraguForm, DodajPesmu
 from spotify_baratanje import SpotifyMoja
 from spotify_utils import SpotifyMoja2
 from scraping_top_100_utils import Top100Movies
@@ -323,6 +323,23 @@ def pronadji_pesme_i_napravi_listu():
     flash(f"Kreirana je nova play lista '{nova_play_lista}' sa {dodat_broj_pesama} pesama za rang listu po 'BILLBOARD HOT 100 LIST', orginalnu top listu možete pogledati na <a href='{billboard_url}'>web stranici</a>", category='success')
     return redirect(url_for("spotify_podaci_posle_auth", billboard_url=billboard_url))
 
+@app.route('/pronadji_pesmu', methods=["GET", "POST"])
+def pronadji_pesmu():
+    playlist_id = request.args.get('playlist_id')
+    forma = DodajPesmu()
+    sp = SpotifyMoja2(scope='playlist-read-private', app=app)
+    if forma.validate_on_submit():
+        song_name = forma.track.data
+        song_artist = forma.artist.data
+        song_year = forma.year.data
+        result = sp.search(q=f"track:{song_name} artist:{song_artist}", type="track")
+        print(result)
+        if len(result["tracks"]['items']) == 0:
+            result = sp.search(q=f"track:{song_name}", type="track")
+        return render_template("prikaz_rezultaat_pretrage.html", pesme=result["tracks"]['items'], playlist_id=playlist_id)
+    return render_template("forma_nova_pesma_pretraga.html", form=forma, playlist_id=playlist_id)
+    return jsonify(result)
+
 
 @app.route('/obrisi_pesmu')
 def obrisi_pesmu():
@@ -331,11 +348,37 @@ def obrisi_pesmu():
     playlist_name = request.args.get('playlist_name')
     sp = SpotifyMoja2(scope='playlist-read-private', app=app)
 
+    # Nalazim vrednost imena liste na osnovu playlist_id
+    playlists = sp.current_user_playlists()
+    key_lista = [i for i in playlists if playlists[i] == playlist_id]
+    playlist_name = key_lista[0]
+
     try:
         sp.playlist_remove_all_occurrences_of_items(playlist_id=playlist_id, items=[song_id])
         print("Pesma uspešno obrisana iz liste.")
     except spotipy.SpotifyException as e:
         print("Greška prilikom brisanja pesme iz liste: {}".format(e))
+
+    return redirect(url_for("prikazi_pesme_sa_playliste", playlist_id=playlist_id, playlist_name=playlist_name))
+
+
+@app.route('/dodaj_pesmu')
+def dodaj_pesmu():
+    playlist_id = request.args.get('playlist_id')
+    song_uri = request.args.get('song_uri')
+    playlist_name = request.args.get('playlist_name')
+    sp = SpotifyMoja2(scope='playlist-read-private', app=app)
+
+    # Nalazim vrednost imena liste na osnovu playlist_id
+    playlists = sp.current_user_playlists()
+    key_lista = [i for i in playlists if playlists[i] == playlist_id]
+    playlist_name = key_lista[0]
+
+    try:
+        sp.playlist_add_items(playlist_id=playlist_id, items=[song_uri])
+        print(f"Pesma uspešno dodata u listu {playlist_name}.")
+    except spotipy.SpotifyException as e:
+        print("Greška prilikom dodavanja pesme u  listu {}".format(e))
 
     return redirect(url_for("prikazi_pesme_sa_playliste", playlist_id=playlist_id, playlist_name=playlist_name))
 

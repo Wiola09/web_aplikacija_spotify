@@ -5,20 +5,20 @@
 <hr>
 
 <h2 class="heading"> {{pesme|length}} Songs in playlist '{{lista}}': </h2>
-<a href="{{url_for('pronadji_pesme_i_napravi_listu')}}" class="button"> Dodaj pesmu</a>
+<a href="{{url_for('pronadji_pesmu', playlist_id=playlist_id)}}" class="button"> Dodaj pesmu</a>
 
 {% for item in pesme %}
 <div class="container">
     <div class="pesmePodaci">
-    <h5><a href="{{item['track']['external_urls']['spotify']}}"> Song {{loop.index}}. {{item['track']['name']}}</a> </h5>
+    <h5><a href="{{item['track']['external_urls']['spotify']}}" target="_blank" rel="nofollow"> Song {{loop.index}}. {{item['track']['name']}}</a> </h5>
     <hr>
-    <h5><a href="{{item['track']['artists'][0]['external_urls']['spotify']}}"> Artist {{item['track']['artists'][0]['name']}}</a></h5>
+    <h5><a href="{{item['track']['artists'][0]['external_urls']['spotify']}} " target="_blank" rel="nofollow"> Artist {{item['track']['artists'][0]['name']}}</a></h5>
 
-    <h5><a href="{{item['track']['album']['external_urls']['spotify']}}">Album name: {{item['track']['album']['name']}}</a></h5>
+    <h5><a href="{{item['track']['album']['external_urls']['spotify']}}" target="_blank" rel="nofollow">Album name: {{item['track']['album']['name']}}</a></h5>
         </div>
     <div class="playListe svePesme" style="background-image: url('{{item['track']['album']['images'][1]['url']}}')">
 <!--        <a href="{{item['track']['href']}}" class="button"> Link autentif</a>-->
-        <a href="{{item['track']['external_urls']['spotify']}}" class="button"> Pusti</a>
+        <a href="{{item['track']['external_urls']['spotify']}}" class="button" target="_blank" rel="nofollow"> Pusti</a>
 <!--        <a href="{{item['track']['preview_url']}}" class="button"> Pesma deo</a>-->
          <hr class="heading">
         <a href="{{ url_for('obrisi_pesmu', playlist_id=playlist_id, playlist_name=lista, song_id=item['track']['id']) }}" class="button delete-button"> Obrisi </a>
