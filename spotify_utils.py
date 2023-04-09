@@ -71,21 +71,37 @@ class SpotifyMoja2(spotipy.Spotify):
             liste_recnik[playlist['name']] = playlist['id']
         return liste_recnik
 
-    def create_playlist_and_add_songs(self, song_uris):
+    def create_playlist_and_add_songs(self, song_uris, date):
         user_id = self.current_user()["id"]
-        date = "20111-08-12"
+        date = date
 
         playlist = self.user_playlist_create(user=user_id, name=f"{date} Billboard 100", public=False)
-        self.logger.info(f"Created new playlist: {playlist['id']}")
+        print(playlist, "gledaj polja")
+        preimer_rezultata = {'collaborative': False, 'description': None,
+         'external_urls': {'spotify': 'https://open.spotify.com/playlist/3KySwk31KxVdCGVWI1Gp5m'},
+         'followers': {'href': None, 'total': 0}, 'href': 'https://api.spotify.com/v1/playlists/3KySwk31KxVdCGVWI1Gp5m',
+         'id': '3KySwk31KxVdCGVWI1Gp5m', 'images': [], 'name': '2014-08-12 Billboard 100',
+         'owner': {'display_name': 'Miroslav Zeljković',
+                   'external_urls': {'spotify': 'https://open.spotify.com/user/31rkqa5szwmbroanwgau2phnxu5e'},
+                   'href': 'https://api.spotify.com/v1/users/31rkqa5szwmbroanwgau2phnxu5e',
+                   'id': '31rkqa5szwmbroanwgau2phnxu5e', 'type': 'user',
+                   'uri': 'spotify:user:31rkqa5szwmbroanwgau2phnxu5e'}, 'primary_color': None, 'public': False,
+         'snapshot_id': 'MSwwNTNjMzkzYjcwYmMwZTU3ZWQxNmZjNDFmNzExYmQwZjhjNTExYjUx',
+         'tracks': {'href': 'https://api.spotify.com/v1/playlists/3KySwk31KxVdCGVWI1Gp5m/tracks', 'items': [],
+                    'limit': 100, 'next': None, 'offset': 0, 'previous': None, 'total': 0}, 'type': 'playlist',
+         'uri': 'spotify:playlist:3KySwk31KxVdCGVWI1Gp5m'}
+
+
+        self.logger.info(f"Created new playlist: {playlist['name']}")
 
         self.playlist_add_items(playlist_id=playlist["id"], items=song_uris)
         self.logger.info(f"Added {len(song_uris)} songs to the playlist.")
 
         print("Care dodao !!!")
 
-    def pronadji_pesme_iz_liste(self):
+    def pronadji_pesme_iz_liste(self, song_names):
         date = "2003-08-12"
-        song_names = ['Incomplete', 'Bent', "It's Gonna Be Me", "Jumpin', Jumpin'"]
+        song_names = song_names
         song_uris = []
         year = date.split("-")[0]
         broj_preskocene = 0
@@ -96,6 +112,10 @@ class SpotifyMoja2(spotipy.Spotify):
                 uri = result["tracks"]["items"][0]["uri"]
                 song_uris.append(uri)
             except IndexError:
+                broj_preskocene += 1
+                print(f"{broj_preskocene}. {song} doesn't exist in Spotify. Skipped.")
+            except TypeError:
+                print("preskoci TypeError")
                 broj_preskocene += 1
                 print(f"{broj_preskocene}. {song} doesn't exist in Spotify. Skipped.")
 

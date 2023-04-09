@@ -10,8 +10,10 @@ from spotipy.oauth2 import SpotifyOAuth
 
 # # Deo koji se odnosi na moje fajlove
 from data_manager import db, DataManager, UserData, UserSema
+from forms_view import UnesiPodateZaPretraguForm
 from spotify_baratanje import SpotifyMoja
 from spotify_utils import SpotifyMoja2
+from scraping_top_100_utils import Top100Movies
 
 APP_SECRET_KEY = os.getenv("APP_SECRET_KEY", "default_value")
 
@@ -120,7 +122,6 @@ def pocetak():
 
 @app.route('/login', methods=["GET", "POST"])
 def login():
-
     if request.method == "POST":
         email = request.form.get('email')
         password = request.form.get('password')
@@ -291,24 +292,27 @@ def prikazi_pesme_sa_playliste():
 def pronadji_pesme_i_napravi_listu():
     """
     Pronalazi pemse iz liste, i kreira sa njima novu PL,
-     TODO: Napraviti pravu listu pesama i dodati je kao argument u funkciju pronadji_pesme_iz_liste
+     TODO: Ispisati broj dodatih pesama i dati url sa top 100
     :return:
     """
+    godina = request.args.get('datum')
     token_info = session.get("token_info", None)
     if not token_info:
         print("Nema token_info")
         return redirect('/pocetak_spotify_auth_vracanje_linka')
 
     sp = SpotifyMoja2(scope='playlist-read-private', app=app)
-    song_uris = sp.pronadji_pesme_iz_liste()
-    sp.create_playlist_and_add_songs(song_uris)
+    objekat_pretraga_pesama = Top100Movies()
+    lista_pesama = objekat_pretraga_pesama.lista_top_100_pesama(godina=godina)
+    # print(lista_pesama)
+    song_uris = sp.pronadji_pesme_iz_liste(lista_pesama)
+    sp.create_playlist_and_add_songs(song_uris, date=godina)
 
-    return "pogledaj liste"
+    return redirect(url_for("spotify_podaci_posle_auth"))
 
 
 @app.route('/obrisi_pesmu')
 def obrisi_pesmu():
-
     playlist_id = request.args.get('playlist_id')
     song_id = request.args.get('song_id')
     sp = SpotifyMoja2(scope='playlist-read-private', app=app)
@@ -337,11 +341,21 @@ def premesti_pesmu():
 
     return redirect(url_for("spotify_podaci_posle_auth"))
 
+# Za sad mi ne treba
+# @app.route('/prikaz_pesama_playlista', methods=["GET", "POST"])
+# def prikaz_pesama_playlista():
+#     return render_template("prikaz_pesama_playlista")
 
-@app.route('/prikaz_pesama_playlista', methods=["GET", "POST"])
-def prikaz_pesama_playlista():
-    return render_template("prikaz_pesama_playlista")
-
+@app.route('/forma_pretraga', methods=["GET", "POST"])
+# @login_required
+def forma_pretraga():
+    forma = UnesiPodateZaPretraguForm()
+    if forma.validate_on_submit():
+        uneti_datum = forma.date.data
+        return redirect(url_for("pronadji_pesme_i_napravi_listu", datum=uneti_datum))
+    return render_template("forma_pretraga.html", form=forma)
+    return render_template("forma_pretraga.html", form=forma, name=current_user.name,
+                           logged_in=current_user.is_authenticated)
 
 if __name__ == '__main__':
     app.run(debug=True, use_reloader=False)
