@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block content %}
+<hr>
+<hr>
+
+<h2 class="heading">Play liste su: </h2>
+
+{% for item, value in liste.items() %}
+<div class="content">
+    <h1 class="heading" target="_blank" rel="nofollow">
+        Playlista {{item}}</h1>
+    <a href="{{url_for('prikazi_pesme_sa_playliste', playlist_name=value, playlist_id=value)}}" class="button"> Pogledaj Pesme</a>
+    <hr class="heading">
+    {% set cover_url = playlist_cover_image(value) %}
+    <img src="{{ cover_url }}" alt="Playlist Cover">
+
+
+    <hr class="heading">
+</div>
+{% endfor %}
+{% endblock %}
+
+{% include "footer.html" %}
+
+

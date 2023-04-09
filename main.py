@@ -232,6 +232,34 @@ def spotify_callback():
     return redirect(url_for('spotify_podaci_posle_auth'))
 
 
+def playlist_cover_image(playlist_id):
+    """
+    Funkcija se prosledjuje na HTML i poziva iz HTML-a
+
+    :param playlist_id: iz HTML dobija vrednost
+    :return: url do slike
+    """
+    sp = SpotifyMoja2(scope='playlist-read-private', app=app)
+    try:
+        url_to_playlist_cover_image = sp.playlist_cover_image(playlist_id)
+        url_to_playlist_cover_image = url_to_playlist_cover_image[1]['url']
+        # Ovako izglea rezultat
+        rezultat = [{'height': 640,
+                     'url': 'https://mosaic.scdn.co/640/ab67616d0000b2732bd281188f485ea182f3bd84ab67616d0000b273c558456b314a72d2593bf45dab67616d0000b273cb31e578d052ea8ff425dc5aab67616d0000b273d0d7dbbbb9ee8980315ea58b',
+                     'width': 640},
+                    {'height': 300,
+                     'url': 'https://mosaic.scdn.co/300/ab67616d0000b2732bd281188f485ea182f3bd84ab67616d0000b273c558456b314a72d2593bf45dab67616d0000b273cb31e578d052ea8ff425dc5aab67616d0000b273d0d7dbbbb9ee8980315ea58b',
+                     'width': 300},
+                    {'height': 60,
+                     'url': 'https://mosaic.scdn.co/60/ab67616d0000b2732bd281188f485ea182f3bd84ab67616d0000b273c558456b314a72d2593bf45dab67616d0000b273cb31e578d052ea8ff425dc5aab67616d0000b273d0d7dbbbb9ee8980315ea58b',
+                     'width': 60}]
+    except:
+        url_to_playlist_cover_image = "Nema"
+
+    print(url_to_playlist_cover_image)
+    return url_to_playlist_cover_image
+
+
 @app.route('/spotify_podaci_posle_auth')
 def spotify_podaci_posle_auth():
     token_info = session.get("token_info", None)
@@ -242,12 +270,21 @@ def spotify_podaci_posle_auth():
 
     # pozivam metod iz moje klase, Override spotipy.Spotify.current_user_playlists() method
     liste_recnik = sp.current_user_playlists()
+
+    return render_template("prikaz_playlista_korisnika.html",
+                           liste=liste_recnik,
+                           playlist_cover_image=playlist_cover_image)
+    return jsonify(liste_recnik)  # vraca kao json stranicu, ali samo imena lista sa njihovim id
     odabrana_lista = '2003-08-12 Billboard 100'
 
-    rezultat = sp.playlist_items(liste_recnik[odabrana_lista])
-
+@app.route('/prikazi_pesme_sa_playliste')
+def prikazi_pesme_sa_playliste():
+    sp = SpotifyMoja2(scope='playlist-read-private', app=app)
+    playlist_id = request.args.get('playlist_id')
+    playlist_name = request.args.get('playlist_name')
+    rezultat = sp.playlist_items(playlist_id)
     # return jsonify(rezultat['items'][0])  # Kod vraca JSON podatke i samo ejdnoj pesmi
-    return render_template("prikaz_pesama_playlista.html", pesme=rezultat['items'], lista=odabrana_lista)
+    return render_template("prikaz_pesama_playlista.html", pesme=rezultat['items'], lista=playlist_name)
 
 
 @app.route('/pronadji_pesme_i_napravi_listu')
