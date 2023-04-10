@@ -103,6 +103,7 @@ class SpotifyMoja2(spotipy.Spotify):
         date = "2003-08-12"
         song_names = song_names
         song_uris = []
+        pesme = []
         year = date.split("-")[0]
         broj_preskocene = 0
         for song in song_names:
@@ -110,7 +111,9 @@ class SpotifyMoja2(spotipy.Spotify):
             # print(result)
             try:
                 uri = result["tracks"]["items"][0]["uri"]
+                pesma = result["tracks"]["items"][0]
                 song_uris.append(uri)
+                pesme.append(pesma)
             except IndexError:
                 broj_preskocene += 1
                 print(f"{broj_preskocene}. {song} doesn't exist in Spotify. Skipped.")
@@ -122,7 +125,7 @@ class SpotifyMoja2(spotipy.Spotify):
         # with open("text2.txt", "a") as f:
         #     for i in song_uris:
         #         f.write(i + "\n")
-        return song_uris
+        return song_uris, pesme
 
     # Primer za overide, ali sam se ipak odlucio da ga ne pravim, vec da hvatam u kodu sa try except
     # def playlist_remove_all_occurrences_of_items(self, playlist_id, items, snapshot_id=None):

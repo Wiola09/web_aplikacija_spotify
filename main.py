@@ -300,6 +300,8 @@ def prikazi_pesme_sa_playliste():
     # return jsonify(rezultat['items'][0])  # Kod vraca JSON podatke i samo ejdnoj pesmi
     return render_template("prikaz_pesama_playlista.html", pesme=rezultat['items'], lista=playlist_name, playlist_id=playlist_id)
 
+globalna_pesme_pretrage = []
+globalna_song_uris = []
 
 @app.route('/pronadji_pesme_i_napravi_listu')
 def pronadji_pesme_i_napravi_listu():
@@ -318,10 +320,55 @@ def pronadji_pesme_i_napravi_listu():
     objekat_pretraga_pesama = Top100Movies()
     lista_pesama, billboard_url = objekat_pretraga_pesama.lista_top_100_pesama(godina=godina)
     # print(lista_pesama)
-    song_uris = sp.pronadji_pesme_iz_liste(lista_pesama)
+    song_uris, pesme = sp.pronadji_pesme_iz_liste(lista_pesama)
+    # return jsonify(pesme[0])
+    playlist_id = ""
+    global globalna_pesme_pretrage
+    global globalna_song_uris
+    globalna_pesme_pretrage=pesme
+    globalna_song_uris = song_uris
+    return render_template("prikaz_rezultaat_pretrage.html", pesme=globalna_pesme_pretrage, playlist_id=playlist_id)
+
     dodat_broj_pesama, nova_play_lista = sp.create_playlist_and_add_songs(song_uris, date=godina)
     flash(f"Kreirana je nova play lista '{nova_play_lista}' sa {dodat_broj_pesama} pesama za rang listu po 'BILLBOARD HOT 100 LIST', orginalnu top listu možete pogledati na <a href='{billboard_url}'>web stranici</a>", category='success')
     return redirect(url_for("spotify_podaci_posle_auth", billboard_url=billboard_url))
+
+@app.route('/obrada_rezultata_top100_i_kreiranje_pl', methods=["GET", "POST"])
+def obrada_rezultata_top100_i_kreiranje_pl():
+
+    # todo resiti prebacivanje BILLBOARD HOT 100 LIST linka i godine za naziv PL
+    global globalna_pesme_pretrage
+    global globalna_song_uris
+
+    if request.method == 'POST':
+        # kreira play listu
+        sp = SpotifyMoja2(scope='playlist-read-private', app=app)
+        dodat_broj_pesama, nova_play_lista = sp.create_playlist_and_add_songs(globalna_song_uris, date="2044")
+
+        flash(
+            f"Kreirana je nova play lista '{nova_play_lista}' sa {dodat_broj_pesama} pesama za rang listu po 'BILLBOARD HOT 100 LIST', orginalnu top listu možete pogledati na <a href='{1}'>web stranici</a>",
+            category='success')
+        return redirect(url_for("spotify_podaci_posle_auth", billboard_url="test"))
+        return render_template("prikaz_rezultaat_pretrage.html", pesme=globalna_pesme_pretrage)
+
+    range_start = request.args.get('range_start')
+    premesti_na_prvu = request.args.get('izvrsi_premestanje_na_prvu_poziciju')
+    # Logika za premestanje odabrane pesme na prvu poziciju, tj. zamenu pozicija
+    if premesti_na_prvu:
+        staro_uri_prvo_mesto = globalna_song_uris[0]
+        globalna_song_uris[0] = globalna_song_uris[int(range_start) - 1]
+        globalna_song_uris[int(range_start) - 1] = staro_uri_prvo_mesto
+        staro_prvo_mesto = globalna_pesme_pretrage[0]
+        globalna_pesme_pretrage[0] = globalna_pesme_pretrage[int(range_start) - 1]
+        globalna_pesme_pretrage[int(range_start) - 1] = staro_prvo_mesto
+        return render_template("prikaz_rezultaat_pretrage.html", pesme=globalna_pesme_pretrage)
+
+    # Uzimanje indeksa preko pritiska dugmeta "Ukloni pesmu" na stranici "prikaz_rezultaat_pretrage.html",
+    # umanjivanje za jedan i brisanje te pesme iz liste
+    # print(range_start, "brisi indeks")
+    del globalna_pesme_pretrage[int(range_start) - 1]
+    del globalna_song_uris[int(range_start) - 1]
+    return render_template("prikaz_rezultaat_pretrage.html", pesme=globalna_pesme_pretrage)
 
 @app.route('/pronadji_pesmu', methods=["GET", "POST"])
 def pronadji_pesmu():

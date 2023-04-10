@@ -6,6 +6,13 @@
 
 <h2 class="heading"> {{pesme|length}} Songs in playlist : </h2>
 <a href="{{url_for('pronadji_pesmu')}}" class="button"> Dodaj pesmu</a>
+<hr class="heading">
+<form method="POST" action="{{ url_for('obrada_rezultata_top100_i_kreiranje_pl')}}">
+    <input type="hidden" name="pesme[]" value="{{ pesme}}">
+  <input type="submit" value="Dodaj u listu" class="button">
+</form>
+
+
 
 {% for item in pesme %}
 <div class="container">
@@ -21,9 +28,10 @@
         <a href="{{item['external_urls']['spotify']}}" class="button" target="_blank" rel="nofollow"> Pusti</a>
 <!--        <a href="{{item['preview_url']}}" class="button"> Pesma deo</a>-->
          <hr class="heading">
-        <a href="{{ url_for('dodaj_pesmu', playlist_id=playlist_id, playlist_name=lista, song_uri=item['uri']) }}" class="button"> Dodaj u listu</a>
+<!-- Koristim if petlju u flask apliakciji da vidim koji link je pritisnut    -->
+        <a href="{{ url_for('obrada_rezultata_top100_i_kreiranje_pl', range_start=loop.index, izvrsi_premestanje_na_prvu_poziciju='DA' )}}" class="button"> Na prvu</a>
+        <a href="{{ url_for('obrada_rezultata_top100_i_kreiranje_pl', range_start=loop.index )}}" class="button delete-button"> Ukloni pesmu</a>
 
-        <a href="{{ url_for('premesti_pesmu', range_start=loop.index, playlist_id=playlist_id, playlist_name=lista )}}" class="button delete-button"> Premesti</a>
 
 
     </div>
