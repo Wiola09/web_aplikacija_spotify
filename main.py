@@ -284,7 +284,6 @@ def spotify_podaci_posle_auth():
     sp.current_user_unfollow_playlist("3KySwk31KxVdCGVWI1Gp5m")
     liste_recnik = sp.current_user_playlists()
     print(len(liste_recnik), "posle brisanja")
-
     return render_template("prikaz_playlista_korisnika.html",
                            liste=liste_recnik,
                            playlist_cover_image=playlist_cover_image)
@@ -328,7 +327,7 @@ def pronadji_pesme_i_napravi_listu():
     globalna_pesme_pretrage=pesme
     globalna_song_uris = song_uris
     return render_template("prikaz_rezultaat_pretrage.html", pesme=globalna_pesme_pretrage, playlist_id=playlist_id)
-
+    # todo preimenovati funkciju i ovaj deo ispod je prebacen u obrada_rezultata_top100_i_kreiranje_pl
     dodat_broj_pesama, nova_play_lista = sp.create_playlist_and_add_songs(song_uris, date=godina)
     flash(f"Kreirana je nova play lista '{nova_play_lista}' sa {dodat_broj_pesama} pesama za rang listu po 'BILLBOARD HOT 100 LIST', orginalnu top listu možete pogledati na <a href='{billboard_url}'>web stranici</a>", category='success')
     return redirect(url_for("spotify_podaci_posle_auth", billboard_url=billboard_url))
