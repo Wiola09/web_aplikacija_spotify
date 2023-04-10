@@ -10,7 +10,7 @@ from spotipy.oauth2 import SpotifyOAuth
 
 # # Deo koji se odnosi na moje fajlove
 from data_manager import db, DataManager, UserData, UserSema
-from forms_view import UnesiPodateZaPretraguForm, DodajPesmu
+from forms_view import UnesiPodateZaPretraguForm, DodajPesmu, DodajListu
 from spotify_baratanje import SpotifyMoja
 from spotify_utils import SpotifyMoja2
 from scraping_top_100_utils import Top100Movies
@@ -255,7 +255,7 @@ def playlist_cover_image(playlist_id):
                      'url': 'https://mosaic.scdn.co/60/ab67616d0000b2732bd281188f485ea182f3bd84ab67616d0000b273c558456b314a72d2593bf45dab67616d0000b273cb31e578d052ea8ff425dc5aab67616d0000b273d0d7dbbbb9ee8980315ea58b',
                      'width': 60}]
     except:
-        url_to_playlist_cover_image = "Nema"
+        url_to_playlist_cover_image = "Nema cover image"
 
     print(url_to_playlist_cover_image)
     return url_to_playlist_cover_image
@@ -295,7 +295,10 @@ def prikazi_pesme_sa_playliste():
     sp = SpotifyMoja2(scope='playlist-read-private', app=app)
     playlist_id = request.args.get('playlist_id')
     playlist_name = request.args.get('playlist_name')
-    rezultat = sp.playlist_items(playlist_id)
+    try:
+        rezultat = sp.playlist_items(playlist_id)
+    except:
+        return "Ne postoji lista"
     # return jsonify(rezultat['items'][0])  # Kod vraca JSON podatke i samo ejdnoj pesmi
     return render_template("prikaz_pesama_playlista.html", pesme=rezultat['items'], lista=playlist_name, playlist_id=playlist_id)
 
@@ -326,11 +329,44 @@ def pronadji_pesme_i_napravi_listu():
     global globalna_song_uris
     globalna_pesme_pretrage=pesme
     globalna_song_uris = song_uris
-    return render_template("prikaz_rezultaat_pretrage.html", pesme=globalna_pesme_pretrage, playlist_id=playlist_id)
+    return render_template("prikaz_rezultaat_pretrage.html", pesme=globalna_pesme_pretrage, playlist_id=playlist_id, top100="top100")
     # todo preimenovati funkciju i ovaj deo ispod je prebacen u obrada_rezultata_top100_i_kreiranje_pl
     dodat_broj_pesama, nova_play_lista = sp.create_playlist_and_add_songs(song_uris, date=godina)
     flash(f"Kreirana je nova play lista '{nova_play_lista}' sa {dodat_broj_pesama} pesama za rang listu po 'BILLBOARD HOT 100 LIST', orginalnu top listu možete pogledati na <a href='{billboard_url}'>web stranici</a>", category='success')
     return redirect(url_for("spotify_podaci_posle_auth", billboard_url=billboard_url))
+
+
+@app.route('/kreiraj_praznu_listu', methods=["GET", "POST"])
+def kreiraj_praznu_listu():
+    sp = SpotifyMoja2(scope='playlist-read-private', app=app)
+
+    forma = DodajListu()
+    if forma.validate_on_submit():
+        naziv_liste = forma.naziv_liste.data
+
+        # Nalazim vrednost playlist_id na osnovu imena liste
+        playlists = sp.current_user_playlists()
+        key_lista = [i for i in playlists if i == naziv_liste]
+        try:
+            playlist_id = key_lista[0]
+        except:
+            playlist_id = None
+        if playlist_id:
+
+            flash(
+                f"Play lista '{naziv_liste}' vec postoji",
+                category='danger')
+            return redirect(url_for("kreiraj_praznu_listu"))
+        else:
+            user_id = sp.current_user()["id"]
+            playlist = sp.user_playlist_create(user=user_id, name=naziv_liste, public=False)
+            flash(
+                f"Kreirana je prazna nova play lista '{naziv_liste}'",
+                category='success')
+            return redirect(url_for('spotify_podaci_posle_auth'))
+    return render_template("forma_pretraga.html", form=forma)
+
+
 
 @app.route('/obrada_rezultata_top100_i_kreiranje_pl', methods=["GET", "POST"])
 def obrada_rezultata_top100_i_kreiranje_pl():
@@ -348,7 +384,7 @@ def obrada_rezultata_top100_i_kreiranje_pl():
             f"Kreirana je nova play lista '{nova_play_lista}' sa {dodat_broj_pesama} pesama za rang listu po 'BILLBOARD HOT 100 LIST', orginalnu top listu možete pogledati na <a href='{1}'>web stranici</a>",
             category='success')
         return redirect(url_for("spotify_podaci_posle_auth", billboard_url="test"))
-        return render_template("prikaz_rezultaat_pretrage.html", pesme=globalna_pesme_pretrage)
+        # return render_template("prikaz_rezultaat_pretrage.html", pesme=globalna_pesme_pretrage)
 
     range_start = request.args.get('range_start')
     premesti_na_prvu = request.args.get('izvrsi_premestanje_na_prvu_poziciju')
@@ -360,17 +396,20 @@ def obrada_rezultata_top100_i_kreiranje_pl():
         staro_prvo_mesto = globalna_pesme_pretrage[0]
         globalna_pesme_pretrage[0] = globalna_pesme_pretrage[int(range_start) - 1]
         globalna_pesme_pretrage[int(range_start) - 1] = staro_prvo_mesto
-        return render_template("prikaz_rezultaat_pretrage.html", pesme=globalna_pesme_pretrage)
+        flash(f"Zamenjene su pozicijeje pesama, izabrana presma je postavljena na prvo mesto liste", category='success')
+        return render_template("prikaz_rezultaat_pretrage.html", pesme=globalna_pesme_pretrage, top100="top100")
 
     # Uzimanje indeksa preko pritiska dugmeta "Ukloni pesmu" na stranici "prikaz_rezultaat_pretrage.html",
     # umanjivanje za jedan i brisanje te pesme iz liste
     # print(range_start, "brisi indeks")
     del globalna_pesme_pretrage[int(range_start) - 1]
     del globalna_song_uris[int(range_start) - 1]
-    return render_template("prikaz_rezultaat_pretrage.html", pesme=globalna_pesme_pretrage)
+    flash(f"Izabrana pesma je obrisana sa liste", category='success')
+    return render_template("prikaz_rezultaat_pretrage.html", pesme=globalna_pesme_pretrage, top100="top100")
 
 @app.route('/pronadji_pesmu', methods=["GET", "POST"])
 def pronadji_pesmu():
+    # todo napraviti zastitu da se ne dodaju iste pesme u istu listu
     playlist_id = request.args.get('playlist_id')
     forma = DodajPesmu()
     sp = SpotifyMoja2(scope='playlist-read-private', app=app)
@@ -381,8 +420,15 @@ def pronadji_pesmu():
         result = sp.search(q=f"track:{song_name} artist:{song_artist}", type="track")
         print(result)
         if len(result["tracks"]['items']) == 0:
+            print("duzina pretrage je nula")
             result = sp.search(q=f"track:{song_name}", type="track")
-        return render_template("prikaz_rezultaat_pretrage.html", pesme=result["tracks"]['items'], playlist_id=playlist_id)
+            flash(
+                f"Nema rezultata pretrage za unete podatke",
+                category='danger')
+        return render_template("prikaz_rezultaat_pretrage.html",
+                               pesme=result["tracks"]['items'],
+                               playlist_id=playlist_id,
+                               pronadji_pesmu="pronadji_pesmu")
     return render_template("forma_nova_pesma_pretraga.html", form=forma, playlist_id=playlist_id)
     return jsonify(result)
 

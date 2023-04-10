@@ -27,3 +27,7 @@ class DodajPesmu(FlaskForm):
     year = StringField("Godina", render_kw={"placeholder": "Enter Song Year"})
     submit_flight_data = SubmitField("Pretraži pesmu")
 
+
+class DodajListu(FlaskForm):
+    naziv_liste = StringField("Naziv Liste", validators=[DataRequired()], render_kw={"placeholder": "Enter New PL Name"})
+    submit_kreiraj_pl = SubmitField("Kreiraj PL")

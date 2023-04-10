@@ -3,15 +3,34 @@
 {% block content %}
 <hr>
 <hr>
+<h5>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+    {% for category, message in messages %}
+    <div class="alert {% if category == 'success' %}alert-success{% else %}alert-danger{% endif %} alert-dismissible fade show"
+         role="alert">
+        <p class="mb-0">{{ message | safe }}</p>
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    {% endfor %}
+    {% endif %}
+    {% endwith %}
 
+</h5>
 <h2 class="heading"> {{pesme|length}} Songs in playlist : </h2>
-<a href="{{url_for('pronadji_pesmu')}}" class="button"> Dodaj pesmu</a>
+{% if pronadji_pesmu: %}
+<a href="{{url_for('pronadji_pesmu', playlist_id=playlist_id, pronadji_pesmu=pronadji_pesmu)}}" class="button"> Pronadji Pesmu</a>
+{% endif %}
 <hr class="heading">
+ {% if top100: %}
+
 <form method="POST" action="{{ url_for('obrada_rezultata_top100_i_kreiranje_pl')}}">
     <input type="hidden" name="pesme[]" value="{{ pesme}}">
-  <input type="submit" value="Dodaj u listu" class="button">
+  <input type="submit" value="Kreiraj PL i dodaj pesme" class="button">
 </form>
-
+{% endif %}
 
 
 {% for item in pesme %}
@@ -25,13 +44,18 @@
         </div>
     <div class="playListe svePesme" style="background-image: url('{{item['album']['images'][1]['url']}}')">
 <!--        <a href="{{item['href']}}" class="button"> Link autentif</a>-->
-        <a href="{{item['external_urls']['spotify']}}" class="button" target="_blank" rel="nofollow"> Pusti</a>
+        <a href="{{item['external_urls']['spotify']}}" class="button" target="_blank" rel="nofollow">PLAY</a>
+        {% if pronadji_pesmu: %}
+        <a href="{{ url_for('dodaj_pesmu', playlist_id=playlist_id, playlist_name=lista, song_uri=item['uri'], pronadji_pesmu=pronadji_pesmu )}}" class="button">Song Add</a>
+        {% endif %}
 <!--        <a href="{{item['preview_url']}}" class="button"> Pesma deo</a>-->
          <hr class="heading">
+
 <!-- Koristim if petlju u flask apliakciji da vidim koji link je pritisnut    -->
+        {% if top100: %}
         <a href="{{ url_for('obrada_rezultata_top100_i_kreiranje_pl', range_start=loop.index, izvrsi_premestanje_na_prvu_poziciju='DA' )}}" class="button"> Na prvu</a>
         <a href="{{ url_for('obrada_rezultata_top100_i_kreiranje_pl', range_start=loop.index )}}" class="button delete-button"> Ukloni pesmu</a>
-
+        {% endif %}
 
 
     </div>

@@ -7,6 +7,23 @@
 {% block content %}
 <hr>
 <hr>
+<h5>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+    {% for category, message in messages %}
+    <div class="alert {% if category == 'success' %}alert-success{% else %}alert-danger{% endif %} alert-dismissible fade show"
+         role="alert">
+        <p class="mb-0">{{ message | safe }}</p>
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    {% endfor %}
+    {% endif %}
+    {% endwith %}
+
+</h5>
+
 <div class="content dugme-edit">
     <h1 class="heading">Billboard Hot 100 list, insert date</h1>
     {{ wtf.quick_form(form, novalidate='True') }}
