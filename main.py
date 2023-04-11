@@ -352,20 +352,17 @@ def kreiraj_praznu_listu():
         except:
             playlist_id = None
         if playlist_id:
-
             flash(
                 f"Play lista '{naziv_liste}' vec postoji",
                 category='danger')
-            return redirect(url_for("kreiraj_praznu_listu"))
         else:
             user_id = sp.current_user()["id"]
             playlist = sp.user_playlist_create(user=user_id, name=naziv_liste, public=False)
             flash(
                 f"Kreirana je prazna nova play lista '{naziv_liste}'",
                 category='success')
-            return redirect(url_for('spotify_podaci_posle_auth'))
+        return redirect(url_for('spotify_podaci_posle_auth'))
     return render_template("forma_pretraga.html", form=forma)
-
 
 
 @app.route('/obrada_rezultata_top100_i_kreiranje_pl', methods=["GET", "POST"])
