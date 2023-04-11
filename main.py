@@ -257,7 +257,7 @@ def playlist_cover_image(playlist_id):
     except:
         url_to_playlist_cover_image = "Nema cover image"
 
-    print(url_to_playlist_cover_image)
+    # print(url_to_playlist_cover_image)
     return url_to_playlist_cover_image
 
 
@@ -280,10 +280,6 @@ def spotify_podaci_posle_auth():
 
     # pozivam metod iz moje klase, Override spotipy.Spotify.current_user_playlists() method
     liste_recnik = sp.current_user_playlists()
-    print(len(liste_recnik), "pre brisanaj")
-    sp.current_user_unfollow_playlist("3KySwk31KxVdCGVWI1Gp5m")
-    liste_recnik = sp.current_user_playlists()
-    print(len(liste_recnik), "posle brisanja")
     return render_template("prikaz_playlista_korisnika.html",
                            liste=liste_recnik,
                            playlist_cover_image=playlist_cover_image)
@@ -358,10 +354,19 @@ def kreiraj_praznu_listu():
         else:
             user_id = sp.current_user()["id"]
             playlist = sp.user_playlist_create(user=user_id, name=naziv_liste, public=False)
+            playlist_id = playlist["id"]
+            playlist_name = playlist['name']
+            rezultat = sp.playlist_items(playlist_id)
             flash(
                 f"Kreirana je prazna nova play lista '{naziv_liste}'",
                 category='success')
-        return redirect(url_for('spotify_podaci_posle_auth'))
+        try:
+            return render_template("prikaz_pesama_playlista.html", pesme=rezultat['items'], lista=playlist_name,
+                               playlist_id=playlist_id)
+        except:
+            return redirect(url_for('spotify_podaci_posle_auth'))
+
+
     return render_template("forma_pretraga.html", form=forma)
 
 
