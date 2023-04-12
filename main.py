@@ -1,4 +1,5 @@
 import os
+import requests
 from flask import Flask, render_template, redirect, url_for, request, flash, current_app, jsonify, session
 from flask_bootstrap import Bootstrap
 from werkzeug.security import check_password_hash
@@ -28,6 +29,9 @@ SPOTIPY_REDIRECT_URI = os.environ["SPOTIPY_REDIRECT_URI"]
 app.config["SPOTIPY_CLIENT_ID"] = SPOTIPY_CLIENT_ID
 app.config["SPOTIPY_CLIENT_SECRET"] = SPOTIPY_CLIENT_SECRET
 app.config["SPOTIPY_REDIRECT_URI"] = SPOTIPY_REDIRECT_URI
+
+# Key https://apilayer.com/marketplace/spotify-api
+API_LAYER_API_KEY = os.environ["API_LAYER_API_KEY"]
 
 # CREATE DATABASE
 # Prva linija mi javlja gresku, problem je bio sto sam dodao env vrednost DATABASE_URL1, pa je on nalazi, ne treba je
@@ -298,8 +302,43 @@ def prikazi_pesme_sa_playliste():
     # return jsonify(rezultat['items'][0])  # Kod vraca JSON podatke i samo ejdnoj pesmi
     return render_template("prikaz_pesama_playlista.html", pesme=rezultat['items'], lista=playlist_name, playlist_id=playlist_id)
 
+@app.route('/prikazi_tekst_pesme')
+def prikazi_tekst_pesme():
+    """
+    Uradio pretplatu na apilayer Spotify API
+    Koristi https://apilayer.com/marketplace/spotify-api , pa live demo
+
+    Ima 500 mesaceno besplatnih zahteva
+    :return:
+    """
+    song_id = request.args.get('song_id')
+
+    url = f"https://api.apilayer.com/spotify/track_lyrics?id={song_id}"
+
+    payload = {}
+    headers = {
+        "apikey": API_LAYER_API_KEY
+    }
+
+    response = requests.request("GET", url, headers=headers, data=payload)
+    import json
+    status_code = response.status_code
+    print(status_code)
+    result = response.text
+    try:
+        response_dict = json.loads(response.text)
+        test = response_dict["lyrics"]["lines"][0]['words']
+        print(test)
+
+        return render_template("prikaz_tekst_pesme.html", pesma=response_dict["lyrics"]["lines"])
+    except:
+        return "Nema teksta za pesmu"
+    return jsonify(response_dict)
+
+
 globalna_pesme_pretrage = []
 globalna_song_uris = []
+
 
 @app.route('/pronadji_pesme_i_napravi_listu')
 def pronadji_pesme_i_napravi_listu():
@@ -507,6 +546,7 @@ def forma_pretraga():
     return render_template("forma_pretraga.html", form=forma)
     return render_template("forma_pretraga.html", form=forma, name=current_user.name,
                            logged_in=current_user.is_authenticated)
+
 
 if __name__ == '__main__':
     app.run(debug=True, use_reloader=False)

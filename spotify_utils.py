@@ -100,6 +100,14 @@ class SpotifyMoja2(spotipy.Spotify):
         return dodat_broj_pesama, nova_play_lista
 
     def pronadji_pesme_iz_liste(self, song_names):
+        """
+        #You can narrow down your search using field filters.
+        # The available filters are album, artist, track, year, upc, # tag:hipster, tag:new, isrc, and genre.
+        # Each field filter only applies to certain result types.
+        # https://developer.spotify.com/documentation/web-api/reference/search
+        :param song_names:
+        :return:
+        """
         date = "2003-08-12"
         song_names = song_names
         song_uris = []

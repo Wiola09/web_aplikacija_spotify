@@ -35,6 +35,7 @@
     <div class="playListe svePesme" style="background-image: url('{{item['track']['album']['images'][1]['url']}}')">
 <!--        <a href="{{item['track']['href']}}" class="button"> Link autentif</a>-->
         <a href="{{item['track']['external_urls']['spotify']}}" class="button" target="_blank" rel="nofollow"> Pusti</a>
+        <a href="{{ url_for('prikazi_tekst_pesme', range_start=loop.index, playlist_id=playlist_id, playlist_name=lista, song_id=item['track']['id'] )}}" class="button" target="_blank" rel="nofollow">Tekst</a>
 <!--        <a href="{{item['track']['preview_url']}}" class="button"> Pesma deo</a>-->
          <hr class="heading">
         <a href="{{ url_for('obrisi_pesmu', playlist_id=playlist_id, playlist_name=lista, song_id=item['track']['id']) }}" class="button delete-button"> Obrisi </a>
