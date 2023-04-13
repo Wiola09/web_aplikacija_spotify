@@ -36,7 +36,10 @@
 <!--        <a href="{{item['track']['href']}}" class="button"> Link autentif</a>-->
         <a href="{{item['track']['external_urls']['spotify']}}" class="button" target="_blank" rel="nofollow"> Pusti</a>
         <a href="{{ url_for('prikazi_tekst_pesme', range_start=loop.index, playlist_id=playlist_id, playlist_name=lista, song_id=item['track']['id'] )}}" class="button" target="_blank" rel="nofollow">Tekst</a>
-<!--        <a href="{{item['track']['preview_url']}}" class="button"> Pesma deo</a>-->
+        <a href="{{ url_for('prikazi_tekst_pesme_genius', range_start=loop.index, umetnik=item['track']['artists'][0]['name'], naziv_pesme=item['track']['name'])}}" class="button" target="_blank" rel="nofollow">Genius</a>
+        <a href="{{ url_for('genius_direktno', range_start=loop.index, umetnik=item['track']['artists'][0]['name'], naziv_pesme=item['track']['name'])}}" class="button" target="_blank" rel="nofollow">genius_direktno</a>
+
+        <!--        <a href="{{item['track']['preview_url']}}" class="button"> Pesma deo</a>-->
          <hr class="heading">
         <a href="{{ url_for('obrisi_pesmu', playlist_id=playlist_id, playlist_name=lista, song_id=item['track']['id']) }}" class="button delete-button"> Obrisi </a>
 

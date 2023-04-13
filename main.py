@@ -1,5 +1,8 @@
 import os
+import time
 import requests
+import json
+import http.client
 from flask import Flask, render_template, redirect, url_for, request, flash, current_app, jsonify, session
 from flask_bootstrap import Bootstrap
 from werkzeug.security import check_password_hash
@@ -32,6 +35,10 @@ app.config["SPOTIPY_REDIRECT_URI"] = SPOTIPY_REDIRECT_URI
 
 # Key https://apilayer.com/marketplace/spotify-api
 API_LAYER_API_KEY = os.environ["API_LAYER_API_KEY"]
+
+# https://pypi.org/project/lyricsgenius/
+# https://docs.genius.com/#/getting-started-h1
+GENIUS_ACCESS_TOKEN = os.environ["GENIUS_ACCESS_TOKEN"]
 
 # CREATE DATABASE
 # Prva linija mi javlja gresku, problem je bio sto sam dodao env vrednost DATABASE_URL1, pa je on nalazi, ne treba je
@@ -321,7 +328,6 @@ def prikazi_tekst_pesme():
     }
 
     response = requests.request("GET", url, headers=headers, data=payload)
-    import json
     status_code = response.status_code
     print(status_code)
     result = response.text
@@ -338,6 +344,101 @@ def prikazi_tekst_pesme():
 
 globalna_pesme_pretrage = []
 globalna_song_uris = []
+
+
+@app.route('/genius_direktno')
+def genius_direktno():
+    umetnik = request.args.get('umetnik')
+    naziv_pesme = request.args.get('naziv_pesme')
+
+    GENIUS_ACCESS_TOKEN = os.environ["GENIUS_ACCESS_TOKEN"]
+
+    tip_zahteva = "/songs/7234505"
+
+    """
+    # !!! https://docs.genius.com/#songs-h2
+    # Prikaz podataka o pesmi sa ID npr. "7234505"
+    Songs
+    A song is a document hosted on Genius. It's usually music lyrics.
+    
+    Data for a song includes details about the document itself and information about all the referents that are
+     attached to it, including the text to which they refer.
+    GET /songs/:id
+    api.genius.com/songs/7234505
+    """
+    tip_zahteva = "/search?q=Toma Zdravkovic"
+    tip_zahteva = "/search?q=Brena"
+    tip_zahteva = f"/search?q={naziv_pesme}"
+    tip_zahteva_with_br = tip_zahteva.replace(' ', '%20')
+    tip_zahteva = tip_zahteva_with_br
+
+    """
+    Search
+    The search capability covers all content hosted on Genius (all songs).
+    GET /search
+    Search documents hosted on Genius.
+    
+    q	The term to search for
+
+    """
+    # tip_zahteva =  "/artists/457175"
+
+    print(tip_zahteva)
+    # konekcija sa genius
+    conn = http.client.HTTPSConnection("api.genius.com")
+    payload = ''
+    headers = {
+        'Authorization': f'Bearer {GENIUS_ACCESS_TOKEN}'
+    }
+    conn.request("GET", f"{tip_zahteva}", payload, headers)
+    res = conn.getresponse()
+    data = res.read()
+    # Pretvaranje u recnik
+    response_dict = json.loads(data.decode("utf-8"))
+
+    # testiranje odogovra
+    print(data.decode("utf-8"))
+    print(type(data.decode("utf-8")))
+    print(type(response_dict))
+
+    # Za tip zahteva tip_zahteva = "/songs/7234505"
+    # yu_tube = response_dict["response"]["song"]["media"][0]["url"]
+    def pretraga_po_tekstu():
+        # Za tip_zahteva = "/search?q=Brena" , stampa umetnika i pesmu
+        umetnici = response_dict["response"]["hits"]
+        for umetnik in umetnici:
+            print(umetnik["result"]["artist_names"], umetnik["result"]["primary_artist"]["api_path"], umetnik["result"]["full_title"], umetnik["result"]["id"])
+    pretraga_po_tekstu()
+    # return redirect(yu_tube)
+    return jsonify(response_dict)
+
+@app.route('/prikazi_tekst_pesme_genius')
+def prikazi_tekst_pesme_genius():
+    umetnik = request.args.get('umetnik')
+    naziv_pesme = request.args.get('naziv_pesme')
+    import lyricsgenius as lyricsgenius
+    print(umetnik)
+    print(naziv_pesme)
+
+    # If you don't pass a token to the Genius class, lyricsgenus will look for an environment variable called
+    # GENIUS_ACCESS_TOKEN and attempt to use that for authentication.
+    genius = lyricsgenius.Genius(GENIUS_ACCESS_TOKEN)
+    artist = genius.search_artist(umetnik, max_songs=3, sort="title")
+    try:
+        print(artist.songs)
+    except:
+        pass
+
+
+    genius.remove_section_headers = True
+    try:
+        song = genius.search_song(naziv_pesme, artist.name)
+        # time.sleep(5)
+        print(song.lyrics)
+        lyrics_with_br = song.lyrics.replace('\n', '<br>')
+        return render_template('genius_prikaz_tekst_pesme.html', lyrics=lyrics_with_br, pesma=naziv_pesme, izvodjac=umetnik)
+    except:
+        return "Nema teksta za pesmu"
 
 
 @app.route('/pronadji_pesme_i_napravi_listu')

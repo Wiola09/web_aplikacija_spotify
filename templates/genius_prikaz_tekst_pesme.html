@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+
+{% block content %}
+<hr>
+<hr>
+<h5>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+    {% for category, message in messages %}
+    <div class="alert {% if category == 'success' %}alert-success{% else %}alert-danger{% endif %} alert-dismissible fade show"
+         role="alert">
+        <p class="mb-0">{{ message | safe }}</p>
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    {% endfor %}
+    {% endif %}
+    {% endwith %}
+
+</h5>
+
+<h2 class="heading"> Tekst pesme: </h2>
+
+<!--Sada morate ažurirati svoj HTML kod tako da umjesto da koristite samo oznaku <p> za prikaz teksta pjesme, koristite-->
+<!--    oznaku <div> zajedno sa | safe, kako bi se HTML oznake u tekstu interpretirale kao HTML kod.-->
+
+<div class="container">
+  <h1>{{ izvodjac}} - {{ pesma}}</h1>
+    <div>{{ lyrics | safe }}</div>
+ </div>
+
+{% endblock %}
+
+{% include "footer.html" %}
+
+
