@@ -303,6 +303,13 @@ def spotify_podaci_posle_auth():
     #  '_id': '1e7d8603c6d6281f6a0481b204d66224cd43a67c0074f4e69bc1f568b9fa744af021052a1445972e43a1624075e8935ba3dc0d57ddc0044fe94201aa24c633bb',
     #  '_user_id': '2', 'token_info': None} >
     # pozivam metod iz moje klase, Override spotipy.Spotify.current_user_playlists() method
+    # https://accounts.spotify.com/authorize?client_id=1888f999a4e34fb0846a471f570f0ac9&response_type=code&redirect_uri=https%3A%2F%2Fmelodify-g14i.onrender.com%2Fspotify_callback&scope=playlist-read-private
+
+
+    # 127.0.0.1 - - [14/Apr/2023 15:16:04] "GET / HTTP/1.1" 302 -
+    # https://accounts.spotify.com/authorize?client_id=1888f999a4e34fb0846a471f570f0ac9&response_type=code&redirect_uri=http%3A%2F%2Flocalhost%3A5000%2Fspotify_callback&scope=playlist-read-private
+    # https://accounts.spotify.com/authorize?client_id=1888f999a4e34fb0846a471f570f0ac9&response_type=code&redirect_uri=http%3A%2F%2Flocalhost%3A5000%2Fspotify_callback&scope=playlist-read-private
+    # 127.0.0.1 - - [14/Apr/2023 15:16:04] "GET / HTTP/1.1" 302 -
     liste_recnik = sp.current_user_playlists()
     return render_template("prikaz_playlista_korisnika.html",
                            liste=liste_recnik,
