@@ -23,6 +23,7 @@ APP_SECRET_KEY = os.getenv("APP_SECRET_KEY", "default_value")
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = APP_SECRET_KEY
+app.config['SESSION_COOKIE_SECURE'] = True
 Bootstrap(app)
 
 # Deo vezan za spotify
@@ -123,7 +124,7 @@ def favicon():
     return redirect(url_for('static', filename='images/favicon.ico'))
 
 
-@app.route('/')
+@app.route('/pocetak')
 def pocetak():
     """ Početna stranica daje dugmad za logovanjE i registrovanje
     :return: prikazuje html stranicu "pocetak.html"
@@ -155,7 +156,9 @@ def login():
         else:  # If the user has successfully logged in or registered, you need to use the login_user() function to
             # authenticate them.
             login_user(user_object)
-            return redirect(url_for('pocetna_aplikacija', name=current_user.name))
+            return redirect(url_for('spotify_podaci_posle_auth',
+                                    name=current_user.name,
+                                    logged_in=current_user.is_authenticated))
 
     return render_template("login.html")
 
@@ -217,7 +220,7 @@ def pocetna_aplikacija():
     return "Zdravo Svete"
 
 
-@app.route('/pocetak_spotify_auth_vracanje_linka')
+@app.route('/')
 def pocetak_spotify_auth_vracanje_linka():
     """
     Kada se radi autentifikacija, dobija se auth_url koja mora da se unese u python kod,
@@ -228,7 +231,7 @@ def pocetak_spotify_auth_vracanje_linka():
     scope = 'playlist-read-private'
     sp_oauth = SpotifyMoja2(scope=scope, app=app)
     auth_url = sp_oauth.get_auth_url()
-    print(auth_url)
+    # print(auth_url)
     return redirect(auth_url)
 
 
@@ -241,7 +244,9 @@ def spotify_callback():
     token_info = sp_oauth.get_cached_token()
     print(token_info, "ovde bi morao biti")
     session["token_info"] = token_info
-    return redirect(url_for('spotify_podaci_posle_auth'))
+    session.modified = True  # dodajemo ovde da bismo osigurali da se promene u sesiji sačuvaju
+    return redirect(url_for('pocetak'))
+    # return redirect(url_for('spotify_podaci_posle_auth', logged_in=current_user.is_authenticated))
 
 
 def playlist_cover_image(playlist_id):
@@ -293,7 +298,8 @@ def spotify_podaci_posle_auth():
     liste_recnik = sp.current_user_playlists()
     return render_template("prikaz_playlista_korisnika.html",
                            liste=liste_recnik,
-                           playlist_cover_image=playlist_cover_image)
+                           playlist_cover_image=playlist_cover_image, name=current_user.name,
+                                    logged_in=current_user.is_authenticated)
     return jsonify(liste_recnik)  # vraca kao json stranicu, ali samo imena lista sa njihovim id
     odabrana_lista = '2003-08-12 Billboard 100'
 
@@ -307,7 +313,8 @@ def prikazi_pesme_sa_playliste():
     except:
         return "Ne postoji lista"
     # return jsonify(rezultat['items'][0])  # Kod vraca JSON podatke i samo ejdnoj pesmi
-    return render_template("prikaz_pesama_playlista.html", pesme=rezultat['items'], lista=playlist_name, playlist_id=playlist_id)
+    return render_template("prikaz_pesama_playlista.html", pesme=rezultat['items'], lista=playlist_name, playlist_id=playlist_id, name=current_user.name,
+                                    logged_in=current_user.is_authenticated)
 
 @app.route('/prikazi_tekst_pesme')
 def prikazi_tekst_pesme():
