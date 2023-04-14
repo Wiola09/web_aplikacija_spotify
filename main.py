@@ -238,13 +238,32 @@ def pocetak_spotify_auth_vracanje_linka():
 
 @app.route('/spotify_callback')
 def spotify_callback():
+    # izvuci kod iz callback URL-a
+    code = request.args.get('code')
+    auth_token_data = {
+        'grant_type': 'authorization_code',
+        'code': code,
+        'redirect_uri': 'http://localhost:5000/spotify_callback',
+        # ovo treba da odgovara redirect_uri u Spotify Developer Dashboard-u
+        'client_id': f'{SPOTIPY_CLIENT_ID}',
+        'client_secret': f'{SPOTIPY_CLIENT_SECRET}',
+    }
+
+    # zatrazi token od Spotify API-ja
+    auth_response = requests.post('https://accounts.spotify.com/api/token', data=auth_token_data)
+
+    # dobij access token kao recnik
+    access_token_data = auth_response.json()
+    print(access_token_data, "ovo sam dobio")
+
+
     # ovde mi ne sme biti dva pojma u scope !!!, nije gteo da se dobije token
     scope = 'playlist-read-private'
     sp_oauth = SpotifyMoja2(scope=scope, app=app)
     session.pop('token_info', None)
     token_info = sp_oauth.get_access_token()
     print(token_info, "ovde bi morao biti")
-    session["token_info"] = token_info
+    session["token_info"] = access_token_data
     session.modified = True  # dodajemo ovde da bismo osigurali da se promene u sesiji sačuvaju
     return redirect(url_for('pocetak'))
     # return redirect(url_for('spotify_podaci_posle_auth', logged_in=current_user.is_authenticated))
