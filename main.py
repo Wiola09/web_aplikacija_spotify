@@ -242,7 +242,7 @@ def spotify_callback():
     scope = 'playlist-read-private'
     sp_oauth = SpotifyMoja2(scope=scope, app=app)
     session.pop('token_info', None)
-    token_info = sp_oauth.get_cached_token()
+    token_info = sp_oauth.get_access_token()
     print(token_info, "ovde bi morao biti")
     session["token_info"] = token_info
     session.modified = True  # dodajemo ovde da bismo osigurali da se promene u sesiji sačuvaju
