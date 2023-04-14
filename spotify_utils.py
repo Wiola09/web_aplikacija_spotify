@@ -8,7 +8,8 @@ class SpotifyMoja2(spotipy.Spotify):
             client_id=app.config['SPOTIPY_CLIENT_ID'],
             client_secret=app.config['SPOTIPY_CLIENT_SECRET'],
             redirect_uri=app.config['SPOTIPY_REDIRECT_URI'],
-            scope=scope
+            scope=scope,
+            cache_path="token.txt"
         )
         self.auth_manager = auth_manager
         super().__init__(auth_manager=auth_manager)
@@ -20,11 +21,10 @@ class SpotifyMoja2(spotipy.Spotify):
     def get_auth_url(self):
         return self.auth_manager.get_authorize_url()
 
-    def get_access_token(self):
+    def get_access_token(self, code):
         try:
-
-            print("usao, get_access_token token info", self.auth_manager.get_access_token())
-            return self.auth_manager.get_access_token()
+            print("usao, get_access_token token info", self.auth_manager.get_access_token(code))
+            return self.auth_manager.get_access_token(code)
         except EOFError as e:
             print(e)
 
