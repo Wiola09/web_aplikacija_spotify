@@ -63,7 +63,7 @@ class DataManager:
             pass
 
 
-class UserSema(UserMixin, db.Model):
+class UserSemaSpotify(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String(100), unique=True)
     password = db.Column(db.String(100))
@@ -77,9 +77,9 @@ class UserData:
         self.name = name
 
     def add_user(self):
-        new_user = UserSema(email=self.email, password=self.password, name=self.name)
+        new_user = UserSemaSpotify(email=self.email, password=self.password, name=self.name)
         db.session.add(new_user)
         db.session.commit()
 
     def pretrazi_db_po_korisniku(self, vrednost_za_pretragu):
-        return UserSema.query.filter_by(email=vrednost_za_pretragu).first()
+        return UserSemaSpotify.query.filter_by(email=vrednost_za_pretragu).first()

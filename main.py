@@ -13,7 +13,7 @@ from logging.handlers import RotatingFileHandler
 from spotipy.oauth2 import SpotifyOAuth
 
 # # Deo koji se odnosi na moje fajlove
-from data_manager import db, DataManager, UserData, UserSema
+from data_manager import db, DataManager, UserData, UserSemaSpotify
 from forms_view import UnesiPodateZaPretraguForm, DodajPesmu, DodajListu
 from spotify_baratanje import SpotifyMoja
 from spotify_utils import SpotifyMoja2
@@ -109,7 +109,7 @@ def loger_debug():
 
 @login_manager.user_loader
 def load_user(user_id):
-    return db.session.get(UserSema, int(user_id))
+    return db.session.get(UserSemaSpotify, int(user_id))
 
 
 # TODO uraditi reformat da se ne koristi direkno klasa DB vec UserData
@@ -182,7 +182,7 @@ def register():
                     email=email,
                     password=password,
                 ).add_user()
-                user = UserSema.query.filter_by(email=email).first()
+                user = UserSemaSpotify.query.filter_by(email=email).first()
 
         except:
             db.session.rollback()
@@ -201,7 +201,8 @@ def register():
         login_user(user)
         print()
 
-        return redirect(url_for("pocetna_aplikacija", name=current_user.name, logged_in=current_user.is_authenticated))
+        return redirect(url_for("spotify_podaci_posle_auth",
+                                name=current_user.name, logged_in=current_user.is_authenticated))
 
     return render_template("register.html")
 
