@@ -432,7 +432,9 @@ def prikazi_tekst_pesme_genius():
 
     genius.remove_section_headers = True
     try:
-        song = genius.search_song(naziv_pesme, artist.name)
+        # song = genius.search_song(naziv_pesme, artist.name)
+        # ne koristim vise rezultat pretarge genius.search_artist, vec direktno pisem umetnika
+        song = genius.search_song(naziv_pesme, umetnik)
         # time.sleep(5)
         print(song.lyrics)
         lyrics_with_br = song.lyrics.replace('\n', '<br>')
@@ -621,16 +623,17 @@ def dodaj_pesmu():
 def premesti_pesmu():
     playlist_id = request.args.get('playlist_id')
     range_start = request.args.get('range_start')
+    playlist_name = request.args.get('playlist_name')
 
     sp = SpotifyMoja2(scope='playlist-read-private', app=app)
-    sp.playlist_reorder_items(playlist_id, range_start=(int(range_start) - 1), insert_before=5, range_length=1,
+    sp.playlist_reorder_items(playlist_id, range_start=(int(range_start) - 1), insert_before=0, range_length=1,
                               snapshot_id=None)
     # sp.pormeni_poziciju_pesme(playlist_id=playlist_id, range_start=(int(range_start)))
 
     # sp = spotipy.Spotify(auth_manager=SpotifyOAuth(scope='playlist-read-private'))
     # SpotifyMoja.pormeni_poziciju_pesme(sp, playlist_id=playlist_id, range_start=(int(range_start)))
+    return redirect(url_for('prikazi_pesme_sa_playliste', playlist_name=playlist_name, playlist_id=playlist_id))
 
-    return redirect(url_for("spotify_podaci_posle_auth"))
 
 # Za sad mi ne treba
 # @app.route('/prikaz_pesama_playlista', methods=["GET", "POST"])
