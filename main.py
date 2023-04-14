@@ -290,13 +290,18 @@ def obrisati_listu():
 @app.route('/spotify_podaci_posle_auth')
 def spotify_podaci_posle_auth():
     token_info = session.get("token_info", None)
+    print(session, "spotify_podaci_posle_auth():")
     if not token_info:
         print("Nema token_info")
         print(token_info, "token")
         print(session)
         return redirect('/pocetak_spotify_auth_vracanje_linka')
     sp = SpotifyMoja2(scope='playlist-read-private', app=app)
-
+    # Vrati sa rendera
+    # < SecureCookieSession
+    # {'_fresh': True,
+    #  '_id': '1e7d8603c6d6281f6a0481b204d66224cd43a67c0074f4e69bc1f568b9fa744af021052a1445972e43a1624075e8935ba3dc0d57ddc0044fe94201aa24c633bb',
+    #  '_user_id': '2', 'token_info': None} >
     # pozivam metod iz moje klase, Override spotipy.Spotify.current_user_playlists() method
     liste_recnik = sp.current_user_playlists()
     return render_template("prikaz_playlista_korisnika.html",

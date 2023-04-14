@@ -21,6 +21,7 @@ class SpotifyMoja2(spotipy.Spotify):
         return self.auth_manager.get_authorize_url()
 
     def get_cached_token(self):
+        print("usao, get_cached_token token info", self.auth_manager.get_cached_token())
         return self.auth_manager.get_cached_token()
 
     def pormeni_poziciju_pesme(self, playlist_id, range_start):
