@@ -232,7 +232,7 @@ def pocetak_spotify_auth_vracanje_linka():
     scope = 'playlist-read-private'
     sp_oauth = SpotifyMoja2(scope=scope, app=app)
     auth_url = sp_oauth.get_auth_url()
-    # print(auth_url)
+    print(auth_url)
     return redirect(auth_url)
 
 
@@ -292,6 +292,8 @@ def spotify_podaci_posle_auth():
     token_info = session.get("token_info", None)
     if not token_info:
         print("Nema token_info")
+        print(token_info, "token")
+        print(session)
         return redirect('/pocetak_spotify_auth_vracanje_linka')
     sp = SpotifyMoja2(scope='playlist-read-private', app=app)
 
