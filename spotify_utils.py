@@ -21,8 +21,12 @@ class SpotifyMoja2(spotipy.Spotify):
         return self.auth_manager.get_authorize_url()
 
     def get_access_token(self):
-        print("usao, get_access_token token info", self.auth_manager.get_access_token())
-        return self.auth_manager.get_access_token()
+        try:
+
+            print("usao, get_access_token token info", self.auth_manager.get_access_token())
+            return self.auth_manager.get_access_token()
+        except EOFError as e:
+            print(e)
 
     def pormeni_poziciju_pesme(self, playlist_id, range_start):
         """
