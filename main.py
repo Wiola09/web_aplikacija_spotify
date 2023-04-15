@@ -489,7 +489,7 @@ def pronadji_pesme_i_napravi_listu():
     objekat_pretraga_pesama = Top100Movies()
     lista_pesama, billboard_url = objekat_pretraga_pesama.lista_top_100_pesama(godina=godina)
     # print(lista_pesama)
-    song_uris, pesme = sp.pronadji_pesme_iz_liste(lista_pesama)
+    song_uris, pesme = sp.pronadji_pesme_iz_liste(lista_pesama, godina)
     # return jsonify(pesme[0])
     playlist_id = ""
     global globalna_pesme_pretrage
@@ -618,12 +618,13 @@ def pronadji_pesmu():
         song_artist = forma.artist.data
         song_year = forma.year.data
         result = sp.search(q=f"track:{song_name} artist:{song_artist}", type="track")
-        print(result)
+        # print(result)
         if len(result["tracks"]['items']) == 0:
             print("duzina pretrage je nula")
             result = sp.search(q=f"track:{song_name}", type="track")
             flash(
-                f"Nema rezultata pretrage za unete podatke",
+                f"Nema rezultata pretrage za ime pesme: '{song_name}' i artist: '{song_artist}', "
+                f"urađena pretraga samo po imenu pesme: '{song_name}'",
                 category='danger')
         return render_template("prikaz_rezultaat_pretrage.html",
                                pesme=result["tracks"]['items'],

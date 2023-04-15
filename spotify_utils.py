@@ -105,7 +105,7 @@ class SpotifyMoja2(spotipy.Spotify):
         print("Care dodao !!!")
         return dodat_broj_pesama, nova_play_lista
 
-    def pronadji_pesme_iz_liste(self, song_names):
+    def pronadji_pesme_iz_liste(self, song_names, godina):
         """
         #You can narrow down your search using field filters.
         # The available filters are album, artist, track, year, upc, # tag:hipster, tag:new, isrc, and genre.
@@ -115,6 +115,7 @@ class SpotifyMoja2(spotipy.Spotify):
         :return:
         """
         date = "2003-08-12"
+        date = godina
         song_names = song_names
         song_uris = []
         pesme = []

@@ -40,12 +40,18 @@ class Top100Movies:
         for i in pesme_lista_sirovo:
             pesme_lista.append(i.getText().strip())
 
-        for indeks, element in enumerate(pesme_lista[:8]):
+        for indeks, element in enumerate(pesme_lista[:20]):
             # print(indeks, element)
             if element == "Additional Awards":
                 pocetni_ideks_pesma = indeks + 1
                 print(pocetni_ideks_pesma)
-
-        pesme_lista_100 = [pesme_lista[i] for i in range(pocetni_ideks_pesma, 404, 4)]
+        try:
+            pesme_lista_100 = [pesme_lista[i] for i in range(pocetni_ideks_pesma, 404, 4)]
+        except:
+            pesme_lista_100 = []
+            for indeks, element in enumerate(pesme_lista):
+                if element == "Imprint/Promotion Label:":
+                    pesme_lista_100.append(pesme_lista[indeks+1])
+        print(pesme_lista)
         print(len(pesme_lista_100))
-        return (pesme_lista_100, url)
+        return (pesme_lista_100[:15], url)
