@@ -28,6 +28,7 @@
 
 <form method="POST" action="{{ url_for('obrada_rezultata_top100_i_kreiranje_pl')}}">
     <input type="hidden" name="pesme[]" value="{{ pesme}}">
+    <input type="hidden" name="dat" value="{{ datum}}">
   <input type="submit" value="Kreiraj PL i dodaj pesme" class="button">
 </form>
 {% endif %}

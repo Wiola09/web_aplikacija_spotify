@@ -496,6 +496,9 @@ def pronadji_pesme_i_napravi_listu():
     global globalna_song_uris
     globalna_pesme_pretrage=pesme
     globalna_song_uris = song_uris
+    # Salejm podatke preko sesije u funkciju obrada_rezultata_top100_i_kreiranje_pl():
+    session["datum_nove_liste"] = godina
+    session["url_nove_liste"] = billboard_url
     return render_template("prikaz_rezultaat_pretrage.html", pesme=globalna_pesme_pretrage, playlist_id=playlist_id,
                            top100="top100", logged_in=current_user.is_authenticated
                            )
@@ -555,12 +558,25 @@ def obrada_rezultata_top100_i_kreiranje_pl():
 
     if request.method == 'POST':
         # kreira play listu
+
+        # Moze da preuzme argument i preko url_for argumenta, i preko skrivenog polja forme, ali posto sam osatvio
+        # mogucnost da se posle pretrage brisu pesme i menja redoslet, zbog pritikanja tih
+        # argumenata izgibe se vrednosti argumenata koje sam poslao na kraju funkcije pronadji_pesme_i_napravi_listu():
+        datum = request.args.get('datum')
+        dat = request.form.get('dat')
+
+        datum = session.get("datum_nove_liste", None)
+        billboard_url = session.get("url_nove_liste", None)
+        print(datum, "sess")
+        print(billboard_url, "sess")
         try:
             sp = SpotifyMoja2(scope='playlist-read-private', app=app)
-            dodat_broj_pesama, nova_play_lista = sp.create_playlist_and_add_songs(globalna_song_uris, date="2044")
+            dodat_broj_pesama, nova_play_lista = sp.create_playlist_and_add_songs(globalna_song_uris, date=datum)
 
             flash(
-                f"Kreirana je nova play lista '{nova_play_lista}' sa {dodat_broj_pesama} pesama za rang listu po 'BILLBOARD HOT 100 LIST', orginalnu top listu možete pogledati na <a href='{1}'>web stranici</a>",
+                f"Kreirana je nova play lista '{nova_play_lista}' sa {dodat_broj_pesama} pesama za rang listu po "
+                f"'BILLBOARD HOT 100 LIST', orginalnu top listu možete pogledati na "
+                f"<a href='{billboard_url}' target='_blank' rel='nofollow'>web stranici</a>",
                 category='success')
         except spotipy.SpotifyException as e:
             print("Greška prilikom kreiranja liste: {}".format(e))
