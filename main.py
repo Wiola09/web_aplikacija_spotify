@@ -555,12 +555,15 @@ def obrada_rezultata_top100_i_kreiranje_pl():
 
     if request.method == 'POST':
         # kreira play listu
-        sp = SpotifyMoja2(scope='playlist-read-private', app=app)
-        dodat_broj_pesama, nova_play_lista = sp.create_playlist_and_add_songs(globalna_song_uris, date="2044")
+        try:
+            sp = SpotifyMoja2(scope='playlist-read-private', app=app)
+            dodat_broj_pesama, nova_play_lista = sp.create_playlist_and_add_songs(globalna_song_uris, date="2044")
 
-        flash(
-            f"Kreirana je nova play lista '{nova_play_lista}' sa {dodat_broj_pesama} pesama za rang listu po 'BILLBOARD HOT 100 LIST', orginalnu top listu možete pogledati na <a href='{1}'>web stranici</a>",
-            category='success')
+            flash(
+                f"Kreirana je nova play lista '{nova_play_lista}' sa {dodat_broj_pesama} pesama za rang listu po 'BILLBOARD HOT 100 LIST', orginalnu top listu možete pogledati na <a href='{1}'>web stranici</a>",
+                category='success')
+        except spotipy.SpotifyException as e:
+            print("Greška prilikom kreiranja liste: {}".format(e))
         return redirect(url_for("spotify_podaci_posle_auth", billboard_url="test", logged_in=current_user.is_authenticated))
         # return render_template("prikaz_rezultaat_pretrage.html", pesme=globalna_pesme_pretrage)
 
