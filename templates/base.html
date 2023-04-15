@@ -70,7 +70,7 @@
         <ul class="navbar-nav ml-auto">
             {% if logged_in: %}
             <li class="nav-item">
-                <a class="nav-link" href="{{ url_for('spotify_podaci_posle_auth') }}">Home</a>{% endif %}
+                <a class="nav-link" href="{{ url_for('spotify_podaci_posle_auth') }}">Sve Play Liste</a>{% endif %}
             </li>
             <!--  Ovaj deo proverava da li je korisnik ulogovan -->
             {% if not logged_in: %}

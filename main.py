@@ -493,7 +493,9 @@ def pronadji_pesme_i_napravi_listu():
     global globalna_song_uris
     globalna_pesme_pretrage=pesme
     globalna_song_uris = song_uris
-    return render_template("prikaz_rezultaat_pretrage.html", pesme=globalna_pesme_pretrage, playlist_id=playlist_id, top100="top100")
+    return render_template("prikaz_rezultaat_pretrage.html", pesme=globalna_pesme_pretrage, playlist_id=playlist_id,
+                           top100="top100", logged_in=current_user.is_authenticated
+                           )
     # todo preimenovati funkciju i ovaj deo ispod je prebacen u obrada_rezultata_top100_i_kreiranje_pl
     dodat_broj_pesama, nova_play_lista = sp.create_playlist_and_add_songs(song_uris, date=godina)
     flash(f"Kreirana je nova play lista '{nova_play_lista}' sa {dodat_broj_pesama} pesama za rang listu po 'BILLBOARD HOT 100 LIST', orginalnu top listu možete pogledati na <a href='{billboard_url}'>web stranici</a>", category='success')
@@ -530,12 +532,12 @@ def kreiraj_praznu_listu():
                 category='success')
         try:
             return render_template("prikaz_pesama_playlista.html", pesme=rezultat['items'], lista=playlist_name,
-                               playlist_id=playlist_id)
+                               playlist_id=playlist_id, logged_in=current_user.is_authenticated)
         except:
-            return redirect(url_for('spotify_podaci_posle_auth'))
+            print("kreiraj exept")
+            return redirect(url_for('spotify_podaci_posle_auth', logged_in=current_user.is_authenticated))
 
-
-    return render_template("forma_pretraga.html", form=forma)
+    return render_template("forma_pretraga.html", form=forma, logged_in=current_user.is_authenticated)
 
 
 @app.route('/obrada_rezultata_top100_i_kreiranje_pl', methods=["GET", "POST"])
@@ -553,7 +555,7 @@ def obrada_rezultata_top100_i_kreiranje_pl():
         flash(
             f"Kreirana je nova play lista '{nova_play_lista}' sa {dodat_broj_pesama} pesama za rang listu po 'BILLBOARD HOT 100 LIST', orginalnu top listu možete pogledati na <a href='{1}'>web stranici</a>",
             category='success')
-        return redirect(url_for("spotify_podaci_posle_auth", billboard_url="test"))
+        return redirect(url_for("spotify_podaci_posle_auth", billboard_url="test", logged_in=current_user.is_authenticated))
         # return render_template("prikaz_rezultaat_pretrage.html", pesme=globalna_pesme_pretrage)
 
     range_start = request.args.get('range_start')
@@ -567,7 +569,8 @@ def obrada_rezultata_top100_i_kreiranje_pl():
         globalna_pesme_pretrage[0] = globalna_pesme_pretrage[int(range_start) - 1]
         globalna_pesme_pretrage[int(range_start) - 1] = staro_prvo_mesto
         flash(f"Zamenjene su pozicijeje pesama, izabrana presma je postavljena na prvo mesto liste", category='success')
-        return render_template("prikaz_rezultaat_pretrage.html", pesme=globalna_pesme_pretrage, top100="top100")
+        return render_template("prikaz_rezultaat_pretrage.html", pesme=globalna_pesme_pretrage, top100="top100",
+                               logged_in=current_user.is_authenticated)
 
     # Uzimanje indeksa preko pritiska dugmeta "Ukloni pesmu" na stranici "prikaz_rezultaat_pretrage.html",
     # umanjivanje za jedan i brisanje te pesme iz liste
@@ -575,7 +578,9 @@ def obrada_rezultata_top100_i_kreiranje_pl():
     del globalna_pesme_pretrage[int(range_start) - 1]
     del globalna_song_uris[int(range_start) - 1]
     flash(f"Izabrana pesma je obrisana sa liste", category='success')
-    return render_template("prikaz_rezultaat_pretrage.html", pesme=globalna_pesme_pretrage, top100="top100")
+    return render_template("prikaz_rezultaat_pretrage.html", pesme=globalna_pesme_pretrage, top100="top100",
+                           logged_in=current_user.is_authenticated)
+
 
 @app.route('/pronadji_pesmu', methods=["GET", "POST"])
 def pronadji_pesmu():
@@ -598,8 +603,11 @@ def pronadji_pesmu():
         return render_template("prikaz_rezultaat_pretrage.html",
                                pesme=result["tracks"]['items'],
                                playlist_id=playlist_id,
-                               pronadji_pesmu="pronadji_pesmu")
-    return render_template("forma_nova_pesma_pretraga.html", form=forma, playlist_id=playlist_id)
+                               pronadji_pesmu="pronadji_pesmu",
+                               logged_in=current_user.is_authenticated
+                               )
+    return render_template("forma_nova_pesma_pretraga.html", form=forma, playlist_id=playlist_id,
+                           logged_in=current_user.is_authenticated)
     return jsonify(result)
 
 
@@ -672,10 +680,12 @@ def forma_pretraga():
     forma = UnesiPodateZaPretraguForm()
     if forma.validate_on_submit():
         uneti_datum = forma.date.data
-        return redirect(url_for("pronadji_pesme_i_napravi_listu", datum=uneti_datum))
-    return render_template("forma_pretraga.html", form=forma)
+        return redirect(url_for("pronadji_pesme_i_napravi_listu", datum=uneti_datum,
+                                logged_in=current_user.is_authenticated)
+                        )
     return render_template("forma_pretraga.html", form=forma, name=current_user.name,
-                           logged_in=current_user.is_authenticated)
+                           logged_in=current_user.is_authenticated
+                           )
 
 
 if __name__ == '__main__':
