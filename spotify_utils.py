@@ -130,7 +130,7 @@ class SpotifyMoja2(spotipy.Spotify):
                 pesme.append(pesma)
             except IndexError:
                 broj_preskocene += 1
-                print(f"{broj_preskocene}. {song} doesn't exist in Spotify. Skipped.")
+                # print(f"{broj_preskocene}. {song} doesn't exist in Spotify. Skipped.")
             except TypeError:
                 print("preskoci TypeError")
                 broj_preskocene += 1
