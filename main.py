@@ -285,9 +285,12 @@ def playlist_cover_image(playlist_id):
 @app.route('/obrisati_listu', methods=['POST'])
 def obrisati_listu():
     lista_za_brisanje = request.form['lista_za_brisanje']
-    sp = SpotifyMoja2(scope='playlist-read-private', app=app)
-    sp.current_user_unfollow_playlist(lista_za_brisanje)
-    flash(f"Lista je uspešno obrisana", category='success')
+    try:
+        sp = SpotifyMoja2(scope='playlist-read-private', app=app)
+        sp.current_user_unfollow_playlist(lista_za_brisanje)
+        flash(f"Lista je uspešno obrisana", category='success')
+    except spotipy.SpotifyException as e:
+        print("Greška prilikom brisanja liste: {}".format(e))
     return redirect(url_for('spotify_podaci_posle_auth'))
 
 
@@ -509,32 +512,35 @@ def kreiraj_praznu_listu():
     forma = DodajListu()
     if forma.validate_on_submit():
         naziv_liste = forma.naziv_liste.data
-
-        # Nalazim vrednost playlist_id na osnovu imena liste
-        playlists = sp.current_user_playlists()
-        key_lista = [i for i in playlists if i == naziv_liste]
         try:
-            playlist_id = key_lista[0]
-        except:
-            playlist_id = None
-        if playlist_id:
-            flash(
-                f"Play lista '{naziv_liste}' vec postoji",
-                category='danger')
-        else:
-            user_id = sp.current_user()["id"]
-            playlist = sp.user_playlist_create(user=user_id, name=naziv_liste, public=False)
-            playlist_id = playlist["id"]
-            playlist_name = playlist['name']
-            rezultat = sp.playlist_items(playlist_id)
-            flash(
-                f"Kreirana je prazna nova play lista '{naziv_liste}'",
-                category='success')
-        try:
-            return render_template("prikaz_pesama_playlista.html", pesme=rezultat['items'], lista=playlist_name,
-                               playlist_id=playlist_id, logged_in=current_user.is_authenticated)
-        except:
-            print("kreiraj exept")
+            # Nalazim vrednost playlist_id na osnovu imena liste
+            playlists = sp.current_user_playlists()
+            key_lista = [i for i in playlists if i == naziv_liste]
+            try:
+                playlist_id = key_lista[0]
+            except:
+                playlist_id = None
+            if playlist_id:
+                flash(
+                    f"Play lista '{naziv_liste}' vec postoji",
+                    category='danger')
+            else:
+                user_id = sp.current_user()["id"]
+                playlist = sp.user_playlist_create(user=user_id, name=naziv_liste, public=False)
+                playlist_id = playlist["id"]
+                playlist_name = playlist['name']
+                rezultat = sp.playlist_items(playlist_id)
+                flash(
+                    f"Kreirana je prazna nova play lista '{naziv_liste}'",
+                    category='success')
+            try:
+                return render_template("prikaz_pesama_playlista.html", pesme=rezultat['items'], lista=playlist_name,
+                                   playlist_id=playlist_id, logged_in=current_user.is_authenticated)
+            except:
+                print("kreiraj exept")
+                return redirect(url_for('spotify_podaci_posle_auth', logged_in=current_user.is_authenticated))
+        except spotipy.SpotifyException as e:
+            print("Greška prilikom kreiranja prazne liste: {}".format(e))
             return redirect(url_for('spotify_podaci_posle_auth', logged_in=current_user.is_authenticated))
 
     return render_template("forma_pretraga.html", form=forma, logged_in=current_user.is_authenticated)
@@ -658,10 +664,12 @@ def premesti_pesmu():
     playlist_id = request.args.get('playlist_id')
     range_start = request.args.get('range_start')
     playlist_name = request.args.get('playlist_name')
-
-    sp = SpotifyMoja2(scope='playlist-read-private', app=app)
-    sp.playlist_reorder_items(playlist_id, range_start=(int(range_start) - 1), insert_before=0, range_length=1,
-                              snapshot_id=None)
+    try:
+        sp = SpotifyMoja2(scope='playlist-read-private', app=app)
+        sp.playlist_reorder_items(playlist_id, range_start=(int(range_start) - 1), insert_before=0, range_length=1,
+                                  snapshot_id=None)
+    except spotipy.SpotifyException as e:
+        print("Greška prilikom premestanja pesme iz liste: {}".format(e))
     # sp.pormeni_poziciju_pesme(playlist_id=playlist_id, range_start=(int(range_start)))
 
     # sp = spotipy.Spotify(auth_manager=SpotifyOAuth(scope='playlist-read-private'))
