@@ -646,9 +646,13 @@ def dodaj_pesmu():
     playlist_id = request.args.get('playlist_id')
     song_uri = request.args.get('song_uri')
     playlist_name = request.args.get('playlist_name')
-    sp = SpotifyMoja2(scope='playlist-read-private', app=app)
+    try:
+        sp = SpotifyMoja2(scope='playlist-modify-private', app=app)
+    except spotipy.SpotifyException as e:
+        print("Greška prilikom dodavanja scope='playlist-modify-private'{} linija 652".format(e))
 
     # Nalazim vrednost imena liste na osnovu playlist_id
+    print("stigao dovde 655")
     playlists = sp.current_user_playlists()
     key_lista = [i for i in playlists if playlists[i] == playlist_id]
     playlist_name = key_lista[0]

@@ -4,6 +4,7 @@ from spotipy.oauth2 import SpotifyOAuth
 
 class SpotifyMoja2(spotipy.Spotify):
     def __init__(self, scope, app):
+        scope='playlist-modify-private playlist-read-private'
         auth_manager = SpotifyOAuth(
             client_id=app.config['SPOTIPY_CLIENT_ID'],
             client_secret=app.config['SPOTIPY_CLIENT_SECRET'],
