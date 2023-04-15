@@ -52,6 +52,6 @@ class Top100Movies:
             for indeks, element in enumerate(pesme_lista):
                 if element == "Imprint/Promotion Label:":
                     pesme_lista_100.append(pesme_lista[indeks+1])
-        print(pesme_lista)
+        # print(pesme_lista)
         print(len(pesme_lista_100))
         return (pesme_lista_100[:15], url)

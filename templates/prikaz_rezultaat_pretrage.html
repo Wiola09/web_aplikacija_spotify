@@ -25,7 +25,7 @@
 {% endif %}
 <hr class="heading">
  {% if top100: %}
-
+<h4> 'BILLBOARD HOT 100 LIST' za datum {{ datum }} možete pogledati na web stranici <a href="{{billboard_url}}" target="_blank" rel="nofollow">billboard_url</a></h4>
 <form method="POST" action="{{ url_for('obrada_rezultata_top100_i_kreiranje_pl')}}">
     <input type="hidden" name="pesme[]" value="{{ pesme}}">
     <input type="hidden" name="dat" value="{{ datum}}">

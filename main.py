@@ -500,7 +500,8 @@ def pronadji_pesme_i_napravi_listu():
     session["datum_nove_liste"] = godina
     session["url_nove_liste"] = billboard_url
     return render_template("prikaz_rezultaat_pretrage.html", pesme=globalna_pesme_pretrage, playlist_id=playlist_id,
-                           top100="top100", logged_in=current_user.is_authenticated
+                           top100="top100", logged_in=current_user.is_authenticated, billboard_url=billboard_url,
+                           datum=godina
                            )
     # todo preimenovati funkciju i ovaj deo ispod je prebacen u obrada_rezultata_top100_i_kreiranje_pl
     dodat_broj_pesama, nova_play_lista = sp.create_playlist_and_add_songs(song_uris, date=godina)
