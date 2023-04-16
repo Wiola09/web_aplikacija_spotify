@@ -673,6 +673,9 @@ def pronadji_pesmu():
                     f"Nema rezultata pretrage za ime pesme: '{song_name}' i artist: '{song_artist}', "
                     f"urađena pretraga samo po imenu pesme: '{song_name}'",
                     category='danger')
+        if song_name:
+            result = sp.search(q=f"track:{song_name}", type="track", limit=30)
+
         return render_template("prikaz_rezultaat_pretrage.html",
                                pesme=result["tracks"]['items'],
                                playlist_id=playlist_id,
