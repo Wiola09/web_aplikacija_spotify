@@ -240,6 +240,7 @@ def pocetak_spotify_auth_vracanje_linka():
     traži da se uloguje
     :return:
     """
+    session["spoti_auth"] = "prosao"
     scope = 'playlist-read-private'
     sp_oauth = SpotifyMoja2(scope=scope, app=app)
     auth_url = sp_oauth.get_auth_url()
@@ -309,6 +310,10 @@ def obrisati_listu():
 def spotify_podaci_posle_auth():
     token_info = session.get("token_info", None)
     print(session, "spotify_podaci_posle_auth():")
+    if session["spoti_auth"] == "prosao":
+        pass
+    else:
+        return redirect('/pocetak_spotify_auth_vracanje_linka')
     if not token_info:
         print("Nema token_info")
         print(token_info, "token")
