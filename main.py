@@ -242,11 +242,11 @@ def pocetak_spotify_auth_vracanje_linka():
     auth_url = sp_oauth.get_auth_url()
     print(auth_url)
     return redirect(auth_url)
-
+sp_oauth = []
 
 @app.route('/spotify_callback')
 def spotify_callback():
-
+    global sp_oauth
     # ovde mi ne sme biti dva pojma u scope !!!, nije gteo da se dobije token
     scope = 'playlist-read-private'
     sp_oauth = SpotifyMoja2(scope=scope, app=app)
@@ -311,7 +311,7 @@ def spotify_podaci_posle_auth():
         print(token_info, "token")
         print(session)
         return redirect('/pocetak_spotify_auth_vracanje_linka')
-    sp = SpotifyMoja2(scope='playlist-read-private', app=app)
+    # sp = SpotifyMoja2(scope='playlist-read-private', app=app)
     # Vrati sa rendera
     # < SecureCookieSession
     # {'_fresh': True,
@@ -325,7 +325,7 @@ def spotify_podaci_posle_auth():
     # https://accounts.spotify.com/authorize?client_id=1888f999a4e34fb0846a471f570f0ac9&response_type=code&redirect_uri=http%3A%2F%2Flocalhost%3A5000%2Fspotify_callback&scope=playlist-read-private
     # https://accounts.spotify.com/authorize?client_id=1888f999a4e34fb0846a471f570f0ac9&response_type=code&redirect_uri=http%3A%2F%2Flocalhost%3A5000%2Fspotify_callback&scope=playlist-read-private
     # 127.0.0.1 - - [14/Apr/2023 15:16:04] "GET / HTTP/1.1" 302 -
-    liste_recnik = sp.current_user_playlists()
+    liste_recnik = sp_oauth.current_user_playlists()
     return render_template("prikaz_playlista_korisnika.html",
                            liste=liste_recnik,
                            playlist_cover_image=playlist_cover_image, name=current_user.name,
