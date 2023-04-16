@@ -130,15 +130,15 @@ def pocetak():
     :return: prikazuje html stranicu "pocetak.html"
     """
     global test
-    test = "test"
+    test = "ulaz u putanju pocetak()"
     token_info = session.get("token_info", None)
     print(session, "pocetak():")
-    if not token_info:
-        print("Nema token_info")
-        print(token_info, "token")
-        print(session)
-
-        return redirect('/pocetak_spotify_auth_vracanje_linka')
+    # if not token_info:
+    #     print("Nema token_info")
+    #     print(token_info, "token")
+    #     print(session)
+    #
+    #     return redirect('/pocetak_spotify_auth_vracanje_linka')
     return render_template("pocetak.html")
 
 
@@ -169,8 +169,11 @@ def login():
             return redirect(url_for('spotify_podaci_posle_auth',
                                     name=current_user.name,
                                     logged_in=current_user.is_authenticated))
-    print(test)
-    if test == "test":
+    global test
+
+    print(test, "pre provere login")
+    if test == "ulaz u putanju pocetak()":
+        test = "putanja login"
         return redirect('/pocetak_spotify_auth_vracanje_linka')
     return render_template("login.html")
 
@@ -215,6 +218,11 @@ def register():
 
         return redirect(url_for("spotify_podaci_posle_auth",
                                 name=current_user.name, logged_in=current_user.is_authenticated))
+
+    print(test, "pre provere register")
+    if test == "ulaz u putanju pocetak()":
+        test == "putanja register"
+        return redirect('/pocetak_spotify_auth_vracanje_linka')
 
     return render_template("register.html")
 
@@ -262,9 +270,17 @@ def spotify_callback():
     print(token_info, "ovde bi morao biti")
     session["token_info"] = token_info
     global test
-    test = "etst5"
-    session.modified = True  # dodajemo ovde da bismo osigurali da se promene u sesiji sačuvaju
-    return redirect(url_for('login'))
+    if test == "putanja register":
+        test = "prosao spotify auth"
+        print("uputio na register")
+        session.modified = True  # dodajemo ovde da bismo osigurali da se promene u sesiji sačuvaju
+        return redirect(url_for('register'))
+    else:
+        if test == "putanja login":
+            test = "prosao spotify auth"
+            print("uputio na login")
+            session.modified = True  # dodajemo ovde da bismo osigurali da se promene u sesiji sačuvaju
+            return redirect(url_for('login'))
     # return redirect(url_for('spotify_podaci_posle_auth', logged_in=current_user.is_authenticated))
 
 
