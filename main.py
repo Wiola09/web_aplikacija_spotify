@@ -269,8 +269,8 @@ def spotify_callback():
     # token_info = sp_oauth.get_cached_token()
     print(token_info, "ovde bi morao biti")
     session["token_info"] = token_info
-    print(test, "ovo je etst u spotify_callback()")
     global test
+    print(test, "ovo je etst u spotify_callback()")
     if test == "putanja register":
         test = "prosao spotify auth"
         print("uputio na register")
