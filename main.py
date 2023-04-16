@@ -123,12 +123,14 @@ def favicon():
     """
     return redirect(url_for('static', filename='images/favicon.ico'))
 
-
+test = "w"
 @app.route('/')
 def pocetak():
     """ Početna stranica daje dugmad za logovanjE i registrovanje
     :return: prikazuje html stranicu "pocetak.html"
     """
+    global test
+    test = "test"
     token_info = session.get("token_info", None)
     print(session, "pocetak():")
     if not token_info:
@@ -167,7 +169,9 @@ def login():
             return redirect(url_for('spotify_podaci_posle_auth',
                                     name=current_user.name,
                                     logged_in=current_user.is_authenticated))
-
+    print(test)
+    if test == "test":
+        return redirect('/pocetak_spotify_auth_vracanje_linka')
     return render_template("login.html")
 
 
@@ -229,9 +233,6 @@ def pocetna_aplikacija():
     return "Zdravo Svete"
 
 
-sp_oauth = SpotifyMoja2(scope="test", app=app)
-
-
 @app.route('/pocetak_spotify_auth_vracanje_linka')
 def pocetak_spotify_auth_vracanje_linka():
     """
@@ -240,7 +241,6 @@ def pocetak_spotify_auth_vracanje_linka():
     traži da se uloguje
     :return:
     """
-    session["spoti_auth"] = "prosao"
     scope = 'playlist-read-private'
     sp_oauth = SpotifyMoja2(scope=scope, app=app)
     auth_url = sp_oauth.get_auth_url()
@@ -250,7 +250,7 @@ def pocetak_spotify_auth_vracanje_linka():
 
 @app.route('/spotify_callback')
 def spotify_callback():
-    global sp_oauth
+
     # ovde mi ne sme biti dva pojma u scope !!!, nije gteo da se dobije token
     scope = 'playlist-read-private'
     sp_oauth = SpotifyMoja2(scope=scope, app=app)
@@ -261,8 +261,10 @@ def spotify_callback():
     # token_info = sp_oauth.get_cached_token()
     print(token_info, "ovde bi morao biti")
     session["token_info"] = token_info
+    global test
+    test = "etst5"
     session.modified = True  # dodajemo ovde da bismo osigurali da se promene u sesiji sačuvaju
-    return redirect(url_for('pocetak'))
+    return redirect(url_for('login'))
     # return redirect(url_for('spotify_podaci_posle_auth', logged_in=current_user.is_authenticated))
 
 
@@ -310,16 +312,12 @@ def obrisati_listu():
 def spotify_podaci_posle_auth():
     token_info = session.get("token_info", None)
     print(session, "spotify_podaci_posle_auth():")
-    if session["spoti_auth"] == "prosao":
-        pass
-    else:
-        return redirect('/pocetak_spotify_auth_vracanje_linka')
     if not token_info:
         print("Nema token_info")
         print(token_info, "token")
         print(session)
         return redirect('/pocetak_spotify_auth_vracanje_linka')
-
+    sp = SpotifyMoja2(scope='playlist-read-private', app=app)
     # Vrati sa rendera
     # < SecureCookieSession
     # {'_fresh': True,
@@ -333,11 +331,7 @@ def spotify_podaci_posle_auth():
     # https://accounts.spotify.com/authorize?client_id=1888f999a4e34fb0846a471f570f0ac9&response_type=code&redirect_uri=http%3A%2F%2Flocalhost%3A5000%2Fspotify_callback&scope=playlist-read-private
     # https://accounts.spotify.com/authorize?client_id=1888f999a4e34fb0846a471f570f0ac9&response_type=code&redirect_uri=http%3A%2F%2Flocalhost%3A5000%2Fspotify_callback&scope=playlist-read-private
     # 127.0.0.1 - - [14/Apr/2023 15:16:04] "GET / HTTP/1.1" 302 -
-    try:
-        liste_recnik = sp_oauth.current_user_playlists()
-    except:
-        sp = SpotifyMoja2(scope='playlist-read-private', app=app)
-        liste_recnik = sp.current_user_playlists()
+    liste_recnik = sp.current_user_playlists()
     return render_template("prikaz_playlista_korisnika.html",
                            liste=liste_recnik,
                            playlist_cover_image=playlist_cover_image, name=current_user.name,
