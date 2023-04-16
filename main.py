@@ -124,11 +124,19 @@ def favicon():
     return redirect(url_for('static', filename='images/favicon.ico'))
 
 
-@app.route('/pocetak')
+@app.route('/')
 def pocetak():
     """ Početna stranica daje dugmad za logovanjE i registrovanje
     :return: prikazuje html stranicu "pocetak.html"
     """
+    token_info = session.get("token_info", None)
+    print(session, "pocetak():")
+    if not token_info:
+        print("Nema token_info")
+        print(token_info, "token")
+        print(session)
+
+        return redirect('/pocetak_spotify_auth_vracanje_linka')
     return render_template("pocetak.html")
 
 
@@ -221,7 +229,7 @@ def pocetna_aplikacija():
     return "Zdravo Svete"
 
 
-@app.route('/')
+@app.route('/pocetak_spotify_auth_vracanje_linka')
 def pocetak_spotify_auth_vracanje_linka():
     """
     Kada se radi autentifikacija, dobija se auth_url koja mora da se unese u python kod,
