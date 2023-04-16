@@ -229,6 +229,9 @@ def pocetna_aplikacija():
     return "Zdravo Svete"
 
 
+sp_oauth = SpotifyMoja2(scope="test", app=app)
+
+
 @app.route('/pocetak_spotify_auth_vracanje_linka')
 def pocetak_spotify_auth_vracanje_linka():
     """
@@ -242,7 +245,7 @@ def pocetak_spotify_auth_vracanje_linka():
     auth_url = sp_oauth.get_auth_url()
     print(auth_url)
     return redirect(auth_url)
-sp_oauth = []
+
 
 @app.route('/spotify_callback')
 def spotify_callback():
