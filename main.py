@@ -221,7 +221,8 @@ def register():
     global test
     print(test, "pre provere register")
     if test == "ulaz u putanju pocetak()":
-        test == "putanja register"
+        test = "putanja register"
+
         return redirect('/pocetak_spotify_auth_vracanje_linka')
 
     return render_template("register.html")
