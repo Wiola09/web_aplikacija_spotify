@@ -218,7 +218,7 @@ def register():
 
         return redirect(url_for("spotify_podaci_posle_auth",
                                 name=current_user.name, logged_in=current_user.is_authenticated))
-
+    global test
     print(test, "pre provere register")
     if test == "ulaz u putanju pocetak()":
         test == "putanja register"
@@ -269,6 +269,7 @@ def spotify_callback():
     # token_info = sp_oauth.get_cached_token()
     print(token_info, "ovde bi morao biti")
     session["token_info"] = token_info
+    print(test, "ovo je etst u spotify_callback()")
     global test
     if test == "putanja register":
         test = "prosao spotify auth"
@@ -647,16 +648,30 @@ def pronadji_pesmu():
     if forma.validate_on_submit():
         song_name = forma.track.data
         song_artist = forma.artist.data
-        song_year = forma.year.data
-        result = sp.search(q=f"track:{song_name} artist:{song_artist}", type="track")
-        # print(result)
-        if len(result["tracks"]['items']) == 0:
-            print("duzina pretrage je nula")
-            result = sp.search(q=f"track:{song_name}", type="track")
-            flash(
-                f"Nema rezultata pretrage za ime pesme: '{song_name}' i artist: '{song_artist}', "
-                f"urađena pretraga samo po imenu pesme: '{song_name}'",
-                category='danger')
+        print(song_artist)
+
+        # Slucaj kad nema ni song_name ni song_artist, vraca ponovo na pretragu
+        if (not song_artist) and (not song_name):
+            print("prazna")
+
+            return render_template("forma_nova_pesma_pretraga.html", form=forma, playlist_id=playlist_id,
+                                   logged_in=current_user.is_authenticated)
+        # song_year = forma.year.data
+
+        # Slucaj kad ima samo song_artist
+        if not song_name:
+            result = sp.search(q=f"artist:{song_artist}", type="track", limit=30)
+        # Slucaj kad ima oba song_artist i song_name , prvo tražio po oba, pa ako ne anđe trazi samo po song_name
+        if song_name and song_artist:
+            result = sp.search(q=f"track:{song_name} artist:{song_artist}", type="track", limit=30)
+            # print(result)
+            if len(result["tracks"]['items']) == 0:
+                print("duzina pretrage je nula")
+                result = sp.search(q=f"track:{song_name}", type="track", limit=30)
+                flash(
+                    f"Nema rezultata pretrage za ime pesme: '{song_name}' i artist: '{song_artist}', "
+                    f"urađena pretraga samo po imenu pesme: '{song_name}'",
+                    category='danger')
         return render_template("prikaz_rezultaat_pretrage.html",
                                pesme=result["tracks"]['items'],
                                playlist_id=playlist_id,
