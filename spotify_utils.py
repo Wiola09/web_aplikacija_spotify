@@ -81,7 +81,7 @@ class SpotifyMoja2(spotipy.Spotify):
         user_id = self.current_user()["id"]
         date = date
 
-        playlist = self.user_playlist_create(user=user_id, name=f"{date} Billboard 100", public=False)
+        playlist = self.user_playlist_create(user=user_id, name=f"Billboard 100 for {date}", public=False)
         print(playlist, "gledaj polja")
         preimer_rezultata = {'collaborative': False, 'description': None,
          'external_urls': {'spotify': 'https://open.spotify.com/playlist/3KySwk31KxVdCGVWI1Gp5m'},

@@ -276,6 +276,7 @@ width: 50%;
 .button.delete-button {
 	 background-color: rgba(230, 87, 230, 0.25);
 	 background: linear-gradient(135deg, #e61a46, #e61a1a);
+	 margin-left: 10px;
 }
 
 footer {
@@ -332,6 +333,7 @@ line-height: 2;
 padding: 10px;
 }
 
+/*# Stilizovanje prikaza pesama */
 
   #playlist {
     display: flex;
@@ -348,6 +350,10 @@ padding: 10px;
   }
   .song img {
     max-width: 100px;
+    margin-right: 10px;
+  }
+  .cover_lista img {
+    max-width: 200px;
     margin-right: 10px;
   }
   .song-details {
@@ -368,6 +374,8 @@ padding: 10px;
   }
   .delete-gpt-button {
   background-color:red}
+  .play-gpt-button {
+  background: linear-gradient(135deg, #1a9be6, #1a57e6);}
 
   .play-button:hover, .lyrics-button:hover {
     background-color: #333;

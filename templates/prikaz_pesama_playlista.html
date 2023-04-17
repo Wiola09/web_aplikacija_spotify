@@ -33,12 +33,13 @@
           <p>{{item['track']['album']['name']}}</p>
         </div>
         <div class="song-buttons">
-          <a href="{{item['track']['external_urls']['spotify']}}" class="button" target="_blank" rel="nofollow" class="play-button">▶️</a>
+          <a href="{{item['track']['external_urls']['spotify']}}" class="play-button play-gpt-button" target="_blank" rel="nofollow" >▶️</a>
           <a href="#" class="lyrics-button">Lyrics</a>
 
           <a href="{{ url_for('premesti_pesmu', range_start=loop.index, playlist_id=playlist_id, playlist_name=lista )}}" class="lyrics-button"> Premesti</a>
 
-          <a href="{{ url_for('obrisi_pesmu', playlist_id=playlist_id, playlist_name=lista, song_id=item['track']['id']) }}" class="play-button delete-gpt-button">✘️</a>
+          <a href="{{ url_for('obrisi_pesmu', playlist_id=playlist_id, playlist_name=lista, song_id=item['track']['id']) }}" class="play-button delete-gpt-button">🗑️️</a>
+<!--                 https://emojipedia.org/wastebasket/-->
 
         </div>
       </div>

@@ -25,38 +25,37 @@
 <a href="{{url_for('kreiraj_praznu_listu')}}" class="button"> Dodaj praznu listu</a>
 <a href="{{url_for('forma_pretraga')}}" class="button"> Pretraži Billboard 100 liste</a>
 
-{% for item, value in liste.items() %}
-{% set cover_url = playlist_cover_image(value) %}
-<div class="container">
+<div id="playlist">
+  <ol>
+      {% for item, value in liste.items() %}
+    <li>
+      <div class="cover_lista song">
+          {% set cover_url, duzina_liste  = playlist_cover_image(value) %}
+          {% if cover_url %}
+              <img src="{{ cover_url }}" alt="Album cover">
+          {% else %}
+              <img src="/static/images/lorenzo-spoleti-MlhJNEUQpBs-unsplash_small.jpg" alt="Default album cover">
+          {% endif %}
 
-    <div>
-        <div> <h3>
-            {{loop.index}}. Playlista {{item}}</h3></div>
+        <div class="song-details">
+          <h3>{{item}}</h3>
+          <p>Broj pesama u listi je {{ duzina_liste  }}</p>
 
-    <div class="playListe" style="background-image: url('{{ cover_url }}')">
-        <a href="{{url_for('pronadji_pesmu', playlist_id=value)}}" class="button">➕ SONG</a>
-<!--        https://emojipedia.org/plus/-->
-        <h1></h1>
-        <a href="{{url_for('prikazi_pesme_sa_playliste', playlist_name=item, playlist_id=value)}}" class="button">All Songs</a>
-        <h1></h1>
-        <div class="content">
+        </div>
+        <div class="song-buttons">
+          <a href="{{url_for('pronadji_pesmu', playlist_id=value)}}" class="play-button play-gpt-button" target="_blank" rel="nofollow">➕ SONG</a>
+          <a href="{{url_for('prikazi_pesme_sa_playliste', playlist_name=item, playlist_id=value)}}" class="lyrics-button">All Songs</a>
+          <a href="{{ url_for('obrisati_listu', lista_za_brisanje_id=value) }}" class="play-button delete-gpt-button">🗑️</a>
+<!--            https://emojipedia.org/wastebasket/-->
 
-            <form method="POST" action="{{ url_for('obrisati_listu') }}">
-                <input type="hidden" name="lista_za_brisanje" value="{{ value }}">
-                <button type="submit" class="button delete-button">✘</button>
-            </form>
-        </div></div>
-
-    </div>
-    <hr class="heading">
-
-    <!--		<div class="right-side">-->
-
-    <!--    <img src="{{ cover_url }}" alt="Playlist Cover">-->
-    <!--		</div>-->
+        </div>
+      </div>
+    </li>
+    <!-- Repeat for each song -->
+      {% endfor %}
+  </ol>
 </div>
 
-{% endfor %}
 {% endblock %}
 
 {% include "footer.html" %}

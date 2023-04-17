@@ -297,6 +297,13 @@ def playlist_cover_image(playlist_id):
     try:
         url_to_playlist_cover_image = sp.playlist_cover_image(playlist_id)
         url_to_playlist_cover_image = url_to_playlist_cover_image[1]['url']
+        rezultat = sp.playlist_items(playlist_id)
+        try:
+            duzina_liste = len(rezultat['items'])
+        except:
+            duzina_liste = 0
+
+
         # Ovako izglea rezultat
         rezultat = [{'height': 640,
                      'url': 'https://mosaic.scdn.co/640/ab67616d0000b2732bd281188f485ea182f3bd84ab67616d0000b273c558456b314a72d2593bf45dab67616d0000b273cb31e578d052ea8ff425dc5aab67616d0000b273d0d7dbbbb9ee8980315ea58b',
@@ -308,18 +315,23 @@ def playlist_cover_image(playlist_id):
                      'url': 'https://mosaic.scdn.co/60/ab67616d0000b2732bd281188f485ea182f3bd84ab67616d0000b273c558456b314a72d2593bf45dab67616d0000b273cb31e578d052ea8ff425dc5aab67616d0000b273d0d7dbbbb9ee8980315ea58b',
                      'width': 60}]
     except:
-        url_to_playlist_cover_image = "Nema cover image"
+        url_to_playlist_cover_image = None
+        rezultat = sp.playlist_items(playlist_id)
+        try:
+            duzina_liste = len(rezultat['items'])
+        except:
+            duzina_liste = 0
 
     # print(url_to_playlist_cover_image)
-    return url_to_playlist_cover_image
+    return url_to_playlist_cover_image, duzina_liste
 
 
-@app.route('/obrisati_listu', methods=['POST'])
+@app.route('/obrisati_listu', methods=["GET", "POST"])
 def obrisati_listu():
-    lista_za_brisanje = request.form['lista_za_brisanje']
+    lista_za_brisanje_id = request.args.get('lista_za_brisanje_id')
     try:
         sp = SpotifyMoja2(scope='playlist-read-private', app=app)
-        sp.current_user_unfollow_playlist(lista_za_brisanje)
+        sp.current_user_unfollow_playlist(lista_za_brisanje_id)
         flash(f"Lista je uspešno obrisana", category='success')
     except spotipy.SpotifyException as e:
         print("Greška prilikom brisanja liste: {}".format(e))
