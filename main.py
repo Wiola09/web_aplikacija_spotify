@@ -255,14 +255,16 @@ def pocetak_spotify_auth_vracanje_linka():
     auth_url = sp_oauth.get_auth_url()
     print(auth_url)
     return redirect(auth_url)
-
+sp = {}
 
 @app.route('/spotify_callback')
 def spotify_callback():
 
     # ovde mi ne sme biti dva pojma u scope !!!, nije gteo da se dobije token
+    global sp
     scope = 'playlist-read-private'
     sp_oauth = SpotifyMoja2(scope=scope, app=app)
+    sp = sp_oauth
     session.pop('token_info', None)
     code = request.args.get('code')
     print(code)
@@ -347,7 +349,7 @@ def spotify_podaci_posle_auth():
         print(token_info, "token")
         print(session)
         return redirect('/pocetak_spotify_auth_vracanje_linka')
-    sp = SpotifyMoja2(scope='playlist-read-private', app=app)
+    # sp = SpotifyMoja2(scope='playlist-read-private', app=app)
     # Vrati sa rendera
     # < SecureCookieSession
     # {'_fresh': True,
