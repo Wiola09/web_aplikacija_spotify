@@ -3,7 +3,7 @@
 {% block content %}
 <hr>
 <hr>
-<h5>
+
     {% with messages = get_flashed_messages(with_categories=true) %}
     {% if messages %}
     {% for category, message in messages %}
@@ -18,41 +18,39 @@
     {% endif %}
     {% endwith %}
 
-</h5>
-
 <h2 class="heading"> {{pesme|length}} Songs in playlist '{{lista}}': </h2>
 <a href="{{url_for('pronadji_pesmu', playlist_id=playlist_id)}}" class="button"> Dodaj pesmu</a>
 
-{% for item in pesme %}
-<div class="container">
-    <div class="pesmePodaci">
-    <h5><a href="{{item['track']['external_urls']['spotify']}}" target="_blank" rel="nofollow"> Song {{loop.index}}. {{item['track']['name']}}</a> </h5>
-    <hr>
-    <h5><a href="{{item['track']['artists'][0]['external_urls']['spotify']}} " target="_blank" rel="nofollow"> Artist {{item['track']['artists'][0]['name']}}</a></h5>
-
-    <h5><a href="{{item['track']['album']['external_urls']['spotify']}}" target="_blank" rel="nofollow">Album name: {{item['track']['album']['name']}}</a></h5>
+<div id="playlist">
+  <ol>
+      {% for item in pesme %}
+    <li>
+      <div class="song">
+        <img src="{{item['track']['album']['images'][1]['url']}}" alt="Album cover">
+        <div class="song-details">
+          <h3>{{item['track']['name']}}</h3>
+          <p>{{item['track']['artists'][0]['name']}}</p>
+          <p>{{item['track']['album']['name']}}</p>
         </div>
-    <div class="playListe svePesme" style="background-image: url('{{item['track']['album']['images'][1]['url']}}')">
-        <h5><a href="#">Please Select A Button</a></h5>
-<!--        <a href="{{item['track']['href']}}" class="button"> Link autentif</a>-->
-        <a href="{{item['track']['external_urls']['spotify']}}" class="button" target="_blank" rel="nofollow">▶️</a>
-<!--        https://emojipedia.org/play-button/-->
-        <hr>
-        <a href="{{ url_for('prikazi_tekst_pesme', range_start=loop.index, playlist_id=playlist_id, playlist_name=lista, song_id=item['track']['id'] )}}" class="button" target="_blank" rel="nofollow">Tekst</a>
-<!--        <a href="{{ url_for('prikazi_tekst_pesme_genius', range_start=loop.index, umetnik=item['track']['artists'][0]['name'], naziv_pesme=item['track']['name'])}}" class="button" target="_blank" rel="nofollow">Genius</a>-->
-<!--        <a href="{{ url_for('genius_direktno', range_start=loop.index, umetnik=item['track']['artists'][0]['name'], naziv_pesme=item['track']['name'])}}" class="button" target="_blank" rel="nofollow">genius_direktno</a>-->
+        <div class="song-buttons">
+          <a href="{{item['track']['external_urls']['spotify']}}" class="button" target="_blank" rel="nofollow" class="play-button">▶️</a>
+          <a href="#" class="lyrics-button">Lyrics</a>
 
-        <!--        <a href="{{item['track']['preview_url']}}" class="button"> Pesma deo</a>-->
-         <hr>
-        <a href="{{ url_for('obrisi_pesmu', playlist_id=playlist_id, playlist_name=lista, song_id=item['track']['id']) }}" class="button delete-button">✘</a>
-        <hr>
-        <a href="{{ url_for('premesti_pesmu', range_start=loop.index, playlist_id=playlist_id, playlist_name=lista )}}" class="button delete-button"> Premesti</a>
+          <a href="{{ url_for('premesti_pesmu', range_start=loop.index, playlist_id=playlist_id, playlist_name=lista )}}" class="lyrics-button"> Premesti</a>
+
+          <a href="{{ url_for('obrisi_pesmu', playlist_id=playlist_id, playlist_name=lista, song_id=item['track']['id']) }}" class="play-button delete-gpt-button">✘️</a>
+
+        </div>
+      </div>
+    </li>
+    <!-- Repeat for each song -->
+      {% endfor %}
+  </ol>
+</div>
 
 
-    </div>
-    <hr class="heading">
-    </div>
-{% endfor %}
+
+
 {% endblock %}
 
 {% include "footer.html" %}

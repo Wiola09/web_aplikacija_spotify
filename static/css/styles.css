@@ -331,3 +331,44 @@ line-height: 2;
 .pesmePodaci{
 padding: 10px;
 }
+
+
+  #playlist {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  .song {
+    display: flex;
+    align-items: center;
+    margin: 10px;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+  }
+  .song img {
+    max-width: 100px;
+    margin-right: 10px;
+  }
+  .song-details {
+    flex: 1;
+  }
+  .song-buttons {
+    display: flex;
+    align-items: center;
+  }
+  .play-button, .lyrics-button {
+    display: inline-block;
+    padding: 5px;
+    margin-left: 10px;
+    text-decoration: none;
+    color: #fff;
+    background-color: #000;
+    border-radius: 5px;
+  }
+  .delete-gpt-button {
+  background-color:red}
+
+  .play-button:hover, .lyrics-button:hover {
+    background-color: #333;
+  }
