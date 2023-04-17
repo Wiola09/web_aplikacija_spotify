@@ -372,3 +372,11 @@ padding: 10px;
   .play-button:hover, .lyrics-button:hover {
     background-color: #333;
   }
+@media screen and (max-width: 550px) {
+    .song-buttons {
+    flex-direction: column;
+    }
+    .play-button, .lyrics-button {
+    margin: 5px 0px;
+    }
+}
