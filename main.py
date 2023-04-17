@@ -257,7 +257,7 @@ def pocetak_spotify_auth_vracanje_linka():
     return redirect(auth_url)
 
 
-sp = {}
+sp = SpotifyMoja2(scope="RRR", app=app)
 
 
 def proveri_spoti_autentifikaciju():
