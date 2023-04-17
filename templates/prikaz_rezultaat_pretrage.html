@@ -33,36 +33,38 @@
 </form>
 {% endif %}
 
-
-{% for item in pesme %}
-<div class="container">
-    <div class="pesmePodaci">
-    <h5><a href="{{item['external_urls']['spotify']}}" target="_blank" rel="nofollow"> Song {{loop.index}}. {{item['name']}}</a> </h5>
-    <hr>
-    <h5><a href="{{item['artists'][0]['external_urls']['spotify']}}" target="_blank" rel="nofollow"> Artist {{item['artists'][0]['name']}}</a></h5>
-
-    <h5><a href="{{item['album']['external_urls']['spotify']}}" target="_blank" rel="nofollow">Album name: {{item['album']['name']}}</a></h5>
+<div id="playlist">
+  <ol>
+      {% for item in pesme %}
+    <li>
+      <div class="song">
+        <img src="{{item['album']['images'][1]['url']}}" alt="Album cover">
+        <div class="song-details">
+          <h3>{{item['name']}}</h3>
+          <p>{{item['artists'][0]['name']}}</p>
+          <p>{{item['album']['name']}}</p>
         </div>
-    <div class="playListe svePesme" style="background-image: url('{{item['album']['images'][1]['url']}}')">
-<!--        <a href="{{item['href']}}" class="button"> Link autentif</a>-->
-        <a href="{{item['external_urls']['spotify']}}" class="button" target="_blank" rel="nofollow">▶️</a>
-        {% if pronadji_pesmu: %}
-        <a href="{{ url_for('dodaj_pesmu', playlist_id=playlist_id, playlist_name=lista, song_uri=item['uri'], pronadji_pesmu=pronadji_pesmu )}}" class="button">➕</a>
-        {% endif %}
-<!--        <a href="{{item['preview_url']}}" class="button"> Pesma deo</a>-->
-         <hr class="heading">
+        <div class="song-buttons">
+          <a href="{{item['external_urls']['spotify']}}" class="play-button play-gpt-button" target="_blank" rel="nofollow" >▶️</a>
+            {% if pronadji_pesmu: %}
+            <a href="{{ url_for('dodaj_pesmu', playlist_id=playlist_id, playlist_name=lista, song_uri=item['uri'], pronadji_pesmu=pronadji_pesmu )}}" class="play-button play-gpt-button" target="_blank" rel="nofollow">➕</a>
+            {% endif %}
+          <a href="#" class="lyrics-button">Lyrics</a>
+            {% if top100: %}
+          <a href="{{ url_for('obrada_rezultata_top100_i_kreiranje_pl', range_start=loop.index, izvrsi_premestanje_na_prvu_poziciju='DA' )}}" class="lyrics-button"> Premesti</a>
 
-<!-- Koristim if petlju u flask apliakciji da vidim koji link je pritisnut    -->
-        {% if top100: %}
-        <a href="{{ url_for('obrada_rezultata_top100_i_kreiranje_pl', range_start=loop.index, izvrsi_premestanje_na_prvu_poziciju='DA' )}}" class="button"> Na prvu</a>
-        <a href="{{ url_for('obrada_rezultata_top100_i_kreiranje_pl', range_start=loop.index )}}" class="button delete-button">✘</a>
-        {% endif %}
+          <a href="{{ url_for('obrada_rezultata_top100_i_kreiranje_pl', range_start=loop.index )}}" class="play-button delete-gpt-button">🗑️️</a>
+            {% endif %}
+<!--                 https://emojipedia.org/wastebasket/-->
 
+        </div>
+      </div>
+    </li>
+    <!-- Repeat for each song -->
+      {% endfor %}
+  </ol>
+</div>
 
-    </div>
-    <hr class="heading">
-    </div>
-{% endfor %}
 {% endblock %}
 
 {% include "footer.html" %}
