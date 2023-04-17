@@ -263,8 +263,9 @@ sp = {}
 def proveri_spoti_autentifikaciju():
     try:
         sp.current_user_playlists()
-    except:
-        print("prosao kroz zastitu istekle sesije")
+    except spotipy.SpotifyException as e:
+        print(f"prosao kroz zastitu istekle sesije, greska je : {e}")
+        session.pop('token_info', None)
         return redirect(url_for('pocetak'))
 
 
