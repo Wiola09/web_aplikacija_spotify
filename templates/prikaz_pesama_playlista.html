@@ -35,7 +35,8 @@
     <div class="playListe svePesme" style="background-image: url('{{item['track']['album']['images'][1]['url']}}')">
         <h5><a href="#">Please Select A Button</a></h5>
 <!--        <a href="{{item['track']['href']}}" class="button"> Link autentif</a>-->
-        <a href="{{item['track']['external_urls']['spotify']}}" class="button" target="_blank" rel="nofollow"> Pusti</a>
+        <a href="{{item['track']['external_urls']['spotify']}}" class="button" target="_blank" rel="nofollow">▶️</a>
+<!--        https://emojipedia.org/play-button/-->
         <hr>
         <a href="{{ url_for('prikazi_tekst_pesme', range_start=loop.index, playlist_id=playlist_id, playlist_name=lista, song_id=item['track']['id'] )}}" class="button" target="_blank" rel="nofollow">Tekst</a>
 <!--        <a href="{{ url_for('prikazi_tekst_pesme_genius', range_start=loop.index, umetnik=item['track']['artists'][0]['name'], naziv_pesme=item['track']['name'])}}" class="button" target="_blank" rel="nofollow">Genius</a>-->
@@ -43,7 +44,7 @@
 
         <!--        <a href="{{item['track']['preview_url']}}" class="button"> Pesma deo</a>-->
          <hr>
-        <a href="{{ url_for('obrisi_pesmu', playlist_id=playlist_id, playlist_name=lista, song_id=item['track']['id']) }}" class="button delete-button"> Obrisi </a>
+        <a href="{{ url_for('obrisi_pesmu', playlist_id=playlist_id, playlist_name=lista, song_id=item['track']['id']) }}" class="button delete-button">✘</a>
         <hr>
         <a href="{{ url_for('premesti_pesmu', range_start=loop.index, playlist_id=playlist_id, playlist_name=lista )}}" class="button delete-button"> Premesti</a>
 

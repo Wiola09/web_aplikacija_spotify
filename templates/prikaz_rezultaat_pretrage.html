@@ -45,9 +45,9 @@
         </div>
     <div class="playListe svePesme" style="background-image: url('{{item['album']['images'][1]['url']}}')">
 <!--        <a href="{{item['href']}}" class="button"> Link autentif</a>-->
-        <a href="{{item['external_urls']['spotify']}}" class="button" target="_blank" rel="nofollow">PLAY</a>
+        <a href="{{item['external_urls']['spotify']}}" class="button" target="_blank" rel="nofollow">▶️</a>
         {% if pronadji_pesmu: %}
-        <a href="{{ url_for('dodaj_pesmu', playlist_id=playlist_id, playlist_name=lista, song_uri=item['uri'], pronadji_pesmu=pronadji_pesmu )}}" class="button">Song Add</a>
+        <a href="{{ url_for('dodaj_pesmu', playlist_id=playlist_id, playlist_name=lista, song_uri=item['uri'], pronadji_pesmu=pronadji_pesmu )}}" class="button">➕</a>
         {% endif %}
 <!--        <a href="{{item['preview_url']}}" class="button"> Pesma deo</a>-->
          <hr class="heading">
@@ -55,7 +55,7 @@
 <!-- Koristim if petlju u flask apliakciji da vidim koji link je pritisnut    -->
         {% if top100: %}
         <a href="{{ url_for('obrada_rezultata_top100_i_kreiranje_pl', range_start=loop.index, izvrsi_premestanje_na_prvu_poziciju='DA' )}}" class="button"> Na prvu</a>
-        <a href="{{ url_for('obrada_rezultata_top100_i_kreiranje_pl', range_start=loop.index )}}" class="button delete-button"> Ukloni pesmu</a>
+        <a href="{{ url_for('obrada_rezultata_top100_i_kreiranje_pl', range_start=loop.index )}}" class="button delete-button">✘</a>
         {% endif %}
 
 

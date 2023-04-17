@@ -34,13 +34,16 @@
             {{loop.index}}. Playlista {{item}}</h3></div>
 
     <div class="playListe" style="background-image: url('{{ cover_url }}')">
-        <a href="{{url_for('prikazi_pesme_sa_playliste', playlist_name=item, playlist_id=value)}}" class="button">Pesme</a>
+        <a href="{{url_for('pronadji_pesmu', playlist_id=value)}}" class="button">➕ SONG</a>
+<!--        https://emojipedia.org/plus/-->
+        <h1></h1>
+        <a href="{{url_for('prikazi_pesme_sa_playliste', playlist_name=item, playlist_id=value)}}" class="button">All Songs</a>
         <h1></h1>
         <div class="content">
 
             <form method="POST" action="{{ url_for('obrisati_listu') }}">
                 <input type="hidden" name="lista_za_brisanje" value="{{ value }}">
-                <button type="submit" class="button delete-button">Obrisi listu</button>
+                <button type="submit" class="button delete-button">✘</button>
             </form>
         </div></div>
 
