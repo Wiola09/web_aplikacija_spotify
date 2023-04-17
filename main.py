@@ -277,6 +277,7 @@ def spotify_callback():
     sp_oauth = SpotifyMoja2(scope=scope, app=app)
     # Sledeca linija bitna, postavljam vrednost sp na autentifikovanu za trenutnu sesiju
     sp = sp_oauth
+    print("postavljen SP")
     session.pop('token_info', None)
     code = request.args.get('code')
     print(code)
@@ -377,6 +378,7 @@ def spotify_podaci_posle_auth():
     # https://accounts.spotify.com/authorize?client_id=1888f999a4e34fb0846a471f570f0ac9&response_type=code&redirect_uri=http%3A%2F%2Flocalhost%3A5000%2Fspotify_callback&scope=playlist-read-private
     # https://accounts.spotify.com/authorize?client_id=1888f999a4e34fb0846a471f570f0ac9&response_type=code&redirect_uri=http%3A%2F%2Flocalhost%3A5000%2Fspotify_callback&scope=playlist-read-private
     # 127.0.0.1 - - [14/Apr/2023 15:16:04] "GET / HTTP/1.1" 302 -
+    proveri_spoti_autentifikaciju()
     liste_recnik = sp.current_user_playlists()
     return render_template("prikaz_playlista_korisnika.html",
                            liste=liste_recnik,
