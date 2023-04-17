@@ -264,6 +264,7 @@ def proveri_spoti_autentifikaciju():
     try:
         sp.current_user_playlists()
     except:
+        print("prosao kroz zastitu istekle sesije")
         return redirect(url_for('pocetak'))
 
 
