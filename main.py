@@ -255,7 +255,17 @@ def pocetak_spotify_auth_vracanje_linka():
     auth_url = sp_oauth.get_auth_url()
     print(auth_url)
     return redirect(auth_url)
+
+
 sp = {}
+
+
+def proveri_spoti_autentifikaciju():
+    try:
+        sp.current_user_playlists()
+    except:
+        return redirect(url_for('pocetak'))
+
 
 @app.route('/spotify_callback')
 def spotify_callback():
@@ -264,6 +274,7 @@ def spotify_callback():
     global sp
     scope = 'playlist-read-private'
     sp_oauth = SpotifyMoja2(scope=scope, app=app)
+    # Sledeca linija bitna, postavljam vrednost sp na autentifikovanu za trenutnu sesiju
     sp = sp_oauth
     session.pop('token_info', None)
     code = request.args.get('code')
@@ -295,7 +306,8 @@ def playlist_cover_image(playlist_id):
     :param playlist_id: iz HTML dobija vrednost
     :return: url do slike
     """
-    sp = SpotifyMoja2(scope='playlist-read-private', app=app)
+    proveri_spoti_autentifikaciju()
+    # sp = SpotifyMoja2(scope='playlist-read-private', app=app)
     try:
         url_to_playlist_cover_image = sp.playlist_cover_image(playlist_id)
         url_to_playlist_cover_image = url_to_playlist_cover_image[1]['url']
@@ -332,7 +344,8 @@ def playlist_cover_image(playlist_id):
 def obrisati_listu():
     lista_za_brisanje_id = request.args.get('lista_za_brisanje_id')
     try:
-        sp = SpotifyMoja2(scope='playlist-read-private', app=app)
+        proveri_spoti_autentifikaciju()
+        # sp = SpotifyMoja2(scope='playlist-read-private', app=app)
         sp.current_user_unfollow_playlist(lista_za_brisanje_id)
         flash(f"Lista je uspešno obrisana", category='success')
     except spotipy.SpotifyException as e:
@@ -373,7 +386,8 @@ def spotify_podaci_posle_auth():
 
 @app.route('/prikazi_pesme_sa_playliste')
 def prikazi_pesme_sa_playliste():
-    sp = SpotifyMoja2(scope='playlist-read-private', app=app)
+    # sp = SpotifyMoja2(scope='playlist-read-private', app=app)
+    proveri_spoti_autentifikaciju()
     playlist_id = request.args.get('playlist_id')
     playlist_name = request.args.get('playlist_name')
     try:
@@ -531,7 +545,8 @@ def pronadji_pesme_i_napravi_listu():
         print("Nema token_info")
         return redirect('/pocetak_spotify_auth_vracanje_linka')
 
-    sp = SpotifyMoja2(scope='playlist-read-private', app=app)
+    # sp = SpotifyMoja2(scope='playlist-read-private', app=app)
+    proveri_spoti_autentifikaciju()
     objekat_pretraga_pesama = Top100Movies()
     lista_pesama, billboard_url = objekat_pretraga_pesama.lista_top_100_pesama(godina=godina)
     # print(lista_pesama)
@@ -557,7 +572,8 @@ def pronadji_pesme_i_napravi_listu():
 
 @app.route('/kreiraj_praznu_listu', methods=["GET", "POST"])
 def kreiraj_praznu_listu():
-    sp = SpotifyMoja2(scope='playlist-read-private', app=app)
+    # sp = SpotifyMoja2(scope='playlist-read-private', app=app)
+    proveri_spoti_autentifikaciju()
 
     forma = DodajListu()
     if forma.validate_on_submit():
@@ -617,7 +633,8 @@ def obrada_rezultata_top100_i_kreiranje_pl():
         print(datum, "sess")
         print(billboard_url, "sess")
         try:
-            sp = SpotifyMoja2(scope='playlist-read-private', app=app)
+            # sp = SpotifyMoja2(scope='playlist-read-private', app=app)
+            proveri_spoti_autentifikaciju()
             dodat_broj_pesama, nova_play_lista = sp.create_playlist_and_add_songs(globalna_song_uris, date=datum)
 
             flash(
@@ -659,7 +676,8 @@ def pronadji_pesmu():
     # todo napraviti zastitu da se ne dodaju iste pesme u istu listu
     playlist_id = request.args.get('playlist_id')
     forma = DodajPesmu()
-    sp = SpotifyMoja2(scope='playlist-read-private', app=app)
+    # sp = SpotifyMoja2(scope='playlist-read-private', app=app)
+    proveri_spoti_autentifikaciju()
     if forma.validate_on_submit():
         song_name = forma.track.data
         song_artist = forma.artist.data
@@ -706,7 +724,8 @@ def obrisi_pesmu():
     playlist_id = request.args.get('playlist_id')
     song_id = request.args.get('song_id')
     playlist_name = request.args.get('playlist_name')
-    sp = SpotifyMoja2(scope='playlist-read-private', app=app)
+    proveri_spoti_autentifikaciju()
+    # sp = SpotifyMoja2(scope='playlist-read-private', app=app)
 
     # Nalazim vrednost imena liste na osnovu playlist_id
     playlists = sp.current_user_playlists()
@@ -728,7 +747,8 @@ def dodaj_pesmu():
     song_uri = request.args.get('song_uri')
     playlist_name = request.args.get('playlist_name')
     try:
-        sp = SpotifyMoja2(scope='playlist-modify-private', app=app)
+        proveri_spoti_autentifikaciju()
+        # sp = SpotifyMoja2(scope='playlist-modify-private', app=app)
     except spotipy.SpotifyException as e:
         print("Greška prilikom dodavanja scope='playlist-modify-private'{} linija 652".format(e))
 
@@ -753,7 +773,8 @@ def premesti_pesmu():
     range_start = request.args.get('range_start')
     playlist_name = request.args.get('playlist_name')
     try:
-        sp = SpotifyMoja2(scope='playlist-read-private', app=app)
+        proveri_spoti_autentifikaciju()
+        # sp = SpotifyMoja2(scope='playlist-read-private', app=app)
         sp.playlist_reorder_items(playlist_id, range_start=(int(range_start) - 1), insert_before=0, range_length=1,
                                   snapshot_id=None)
     except spotipy.SpotifyException as e:
