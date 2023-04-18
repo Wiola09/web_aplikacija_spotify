@@ -263,13 +263,15 @@ sp = SpotifyMoja2(scope="RRR", app=app)
 def proveri_spoti_autentifikaciju():
     try:
         # print("pre", sp.auth_manager.validate_token(session["token_info"]))
-        test = sp.auth_manager.refresh_access_token(session['token_info']['refresh_token'])
-        session['token_info'] = test
-        print("ovo jbt", test)
-        # # sp.refresh_access_token(session['token_info']['refresh_token'])
-        # print("posle", sp.auth_manager.validate_token(session["token_info"]))
-        # sp.validate_token(session["token_info"])
-        sp.current_user_playlists()
+        print("je li istekao",sp.auth_manager.is_token_expired(session['token_info']))
+        if sp.auth_manager.is_token_expired(session['token_info']):
+            test = sp.auth_manager.refresh_access_token(session['token_info']['refresh_token'])
+            session['token_info'] = test
+            print("ovo jbt", test)
+            # # sp.refresh_access_token(session['token_info']['refresh_token'])
+            # print("posle", sp.auth_manager.validate_token(session["token_info"]))
+            # sp.validate_token(session["token_info"])
+            sp.current_user_playlists()
     except spotipy.SpotifyException as e:
         print(f"prosao kroz zastitu istekle sesije, greska je : {e}")
         session.pop('token_info', None)
